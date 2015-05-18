@@ -7,7 +7,11 @@ public class Main
 	{
 		// TODO Auto-generated method stub
 		System.out.println("Hello World");
+<<<<<<< HEAD
 		System.out.println("Hello World é o caraio");
+=======
+		System.out.println("Hello World 2");
+>>>>>>> origin/master
 	}
 
 }
