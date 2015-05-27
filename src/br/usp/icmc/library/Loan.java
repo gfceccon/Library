@@ -31,4 +31,3 @@ public class Loan implements CSVSerializable
 		return 5;
 	}
 }
-

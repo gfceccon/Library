@@ -30,16 +30,16 @@ public class LibraryController {
         this.currentDate = date;
     }
 
-    public Loan lendBook(int bookId, String userLogin) throws Exception {
+    public Loan lendBook(int bookId, String userLogin) throws Exception{
         Optional<Book> book = books
-                .stream()
-                .filter(b -> b.id == bookId)
-                .findFirst();                   // Procura pelo livro a partir do id fornecido
+            .stream()
+            .filter(b -> b.id == bookId)
+            .findFirst();                   // Procura pelo livro a partir do id fornecido
 
         Optional<User> user = users
-                .stream()
-                .filter(u -> u.login.equals(userLogin))
-                .findFirst();                   // Procura pelo usuário a partir do login fornecido
+            .stream()
+            .filter(u -> u.login.equals(userLogin))
+            .findFirst();                   // Procura pelo usuário a partir do login fornecido
 
         if(user.isPresent()){
             if(book.isPresent()){
@@ -104,9 +104,9 @@ public class LibraryController {
 
     public Student addStudent(String login, String name, String contact, String email) throws Exception {
         Optional<User> user = users
-                .stream()
-                .filter(u -> u.login.equals(login))
-                .findFirst();
+            .stream()
+            .filter(u -> u.login.equals(login))
+            .findFirst();
 
         if(!user.isPresent()){
             Student newStudent = new Student();
@@ -171,8 +171,9 @@ public class LibraryController {
     public Text addText(String title) throws Exception {
         int nextId = 0;
 
-        if(books.size() > 0)
+        if(books.size() > 0) {
             nextId = books.get(books.size() - 1).id + 1;
+        }
 
         Text newText = new Text();
         newText.id = nextId;
@@ -258,5 +259,4 @@ public class LibraryController {
                  .filter(l -> l.id == id)
                  .findFirst();
     }
-
 }
