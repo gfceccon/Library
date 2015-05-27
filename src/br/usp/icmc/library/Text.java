@@ -11,17 +11,33 @@ public class Text extends Book
 	{
 		if (args.length != getNumberOfArguments())
 			throw new IllegalArgumentException("Wrong number of arguments");
+
+		super.parse(args);
 	}
 
 	@Override
-	public String toCSV() throws Exception
+	public String[] toCSV() throws Exception
 	{
-		return null;
+		String[] ret = new String[getNumberOfArguments()];
+
+		ret[0] = "Text";
+		ret[1] = Integer.toString(this.id);
+		ret[2] = this.title;
+		if(this.isAvailable)
+		{
+			ret[3] = "YES";
+		}
+		else
+		{
+			ret[3] = "NO";
+		}
+
+		return ret;
 	}
 
 	@Override
 	public int getNumberOfArguments()
 	{
-		return 3;
+		return 4;
 	}
 }

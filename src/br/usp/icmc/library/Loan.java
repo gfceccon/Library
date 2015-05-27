@@ -20,7 +20,7 @@ public class Loan implements CSVSerializable
 	}
 
 	@Override
-	public String toCSV() throws Exception
+	public String[] toCSV() throws Exception
 	{
 		return null;
 	}
