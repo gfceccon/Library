@@ -15,19 +15,23 @@ public class General extends Book
 	}
 
 	@Override
-	public String toCSV() throws Exception
+	public String[] toCSV() throws Exception
 	{
-		String isAvailable;
+		String[] ret = new String[getNumberOfArguments()];
+
+		ret[0] = "General";
+		ret[1] = Integer.toString(this.id);
+		ret[2] = this.title;
 		if(this.isAvailable)
 		{
-			isAvailable = "YES";
+			ret[3] = "YES";
 		}
 		else
 		{
-			isAvailable = "NO";
+			ret[3] = "NO";
 		}
 
-		return "General," + Integer.toString(this.id) + "," + this.title + "," + isAvailable + "\n";
+		return ret;
 	}
 
 	@Override

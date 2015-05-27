@@ -17,9 +17,17 @@ public class Teacher extends User
 	}
 
 	@Override
-	public String toCSV() throws Exception
+	public String[] toCSV() throws Exception
 	{
-		return "Community," + this.name + "," + this.login + "," + this.contact + "," + this.email + "," + this.getBanDate().format(DateTimeFormatter.ofPattern("dd'/'MM'/'yyyy")) + "\n";
+		String[] ret = new String[getNumberOfArguments()];
+
+		ret[0] = "Teacher";
+		ret[1] = this.name;
+		ret[2] = this.login;
+		ret[3] = this.contact;
+		ret[4] = this.getBanDate().format(DateTimeFormatter.ofPattern("dd'/'MM'/'yyyy"));
+
+		return ret;
 	}
 
 	@Override
