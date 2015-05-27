@@ -188,19 +188,4 @@ public class LibraryController {
     public void removeCommunity(String name, String contact, String email) {
         // TODO
     }
-
-	public List<User> getUsers()
-	{
-		return users;
-	}
-
-	public List<Book> getBooks()
-	{
-		return books;
-	}
-
-	public List<Loan> getLoans()
-	{
-		return loans;
-	}
 }
