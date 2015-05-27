@@ -20,6 +20,8 @@ public class Main extends Application
 			primaryStage.show();
 		});
 		Pane pane = new Pane(datePicker);
+		pane.setPrefWidth(800);
+		pane.setPrefHeight(600);
 		Scene scene = new Scene(pane);
 
 		primaryStage.setScene(scene);
