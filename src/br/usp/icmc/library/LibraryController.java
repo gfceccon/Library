@@ -1,10 +1,11 @@
 package br.usp.icmc.library;
 
-import javax.management.InvalidAttributeValueException;
 import java.time.LocalDate;
+import java.time.Period;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 public class LibraryController {
     private LocalDate currentDate;
@@ -29,16 +30,16 @@ public class LibraryController {
         this.currentDate = date;
     }
 
-    public Loan lendBook(int bookId, String userLogin) throws Exception{
+    public Loan lendBook(int bookId, String userLogin) throws Exception {
         Optional<Book> book = books
-            .stream()
-            .filter(b -> b.id == bookId)
-            .findFirst();                   // Procura pelo livro a partir do id fornecido
+                .stream()
+                .filter(b -> b.id == bookId)
+                .findFirst();                   // Procura pelo livro a partir do id fornecido
 
         Optional<User> user = users
-            .stream()
-            .filter(u -> u.login.equals(userLogin))
-            .findFirst();                   // Procura pelo usuário a partir do login fornecido
+                .stream()
+                .filter(u -> u.login.equals(userLogin))
+                .findFirst();                   // Procura pelo usuário a partir do login fornecido
 
         if(user.isPresent()){
             if(book.isPresent()){
@@ -51,16 +52,17 @@ public class LibraryController {
                 if(book.get() instanceof Text && user.get() instanceof Community)
                     throw new Exception("Community user can't borrow text books!");
 
-                if(users    // Se o usuário já tiver emprestado o máximo de livros possíveis
-                    .stream()
-                    .filter(u -> u.login.equals(userLogin))
-                    .count() == user.get().maxBookCount)
+                if(loans    // Se o usuário já tiver emprestado o máximo de livros possíveis
+                        .stream()
+                        .filter(l -> l.user.login.equals(userLogin))
+                        .filter(l -> l.returnDate == null)
+                        .count() == user.get().maxBookCount)
                     throw new Exception("User can't borrow more books!");
 
                 user.get().maxBookCount++;
                 book.get().isAvailable = false;
 
-                Loan newLoan = new Loan(loans.size() + 1, user.get(), book.get(), currentDate);
+                Loan newLoan = new Loan(loans.size(), user.get(), book.get(), currentDate);
                 newLoan.toCSV();
 
                 loans.add(newLoan);
@@ -73,15 +75,29 @@ public class LibraryController {
         }
     }
 
-    public void returnBook(int loanId) {
-        // TODO
+    public void returnBook(int loanId) throws Exception {
+        if(loanId < 0 || loanId > loans.size() - 1)
+            throw new IllegalArgumentException("Invalid loan ID!");
+
+        Loan loan = loans.get(loanId);
+
+        if(currentDate.compareTo(loan.loanDate.plusDays(loan.user.maxLoanTime)) > 0){
+            // Se a data atual é maior que a data máxima de devolução, calcula o tempo de suspensão do usuário
+            loan.user.setBanDate(currentDate.plusDays(Period.between(loan.loanDate.plusDays(loan.user.maxLoanTime), currentDate).getDays()));
+        }
+
+        loan.returnDate = currentDate;
+        loan.user.maxBookCount--;
+        loan.book.isAvailable = true;
+
+        loan.toCSV();
     }
 
     public Student addStudent(String login, String name, String contact, String email) throws Exception {
         Optional<User> user = users
-            .stream()
-            .filter(u -> u.login.equals(login))
-            .findFirst();
+                .stream()
+                .filter(u -> u.login.equals(login))
+                .findFirst();
 
         if(!user.isPresent()){
             Student newStudent = new Student();
@@ -150,15 +166,14 @@ public class LibraryController {
     }
 
     public Text addText(String title){
-        int lastId = 0;
+        int nextId = 0;
 
-        if(books.size() > 0) {
-            lastId = books.get(books.size() - 1).id;
-        }
+        if(books.size() > 0)
+            nextId = books.get(books.size() - 1).id + 1;
 
         Text newText = new Text();
 
-        newText.id = books.size() + 1;
+        newText.id = nextId;
         newText.title = title;
         
         books.add(newText);
@@ -167,9 +182,14 @@ public class LibraryController {
     }
 
     public General addGeneral(String title){
+        int nextId = 0;
+
+        if(books.size() > 0)
+            nextId = books.get(books.size() - 1).id + 1;
+
         General newGeneral = new General();
 
-        newGeneral.id = books.size() + 1;
+        newGeneral.id = nextId;
         newGeneral.title = title;
 
         books.add(newGeneral);
@@ -177,15 +197,63 @@ public class LibraryController {
         return newGeneral;
     }
 
-    public void removeStudent(String name, String contact, String email) {
+    public void removeStudent(String login) {
         // TODO
     }
 
-    public void removeTeacher(String name, String contact, String email) {
+    public void removeTeacher(String login) {
         // TODO
     }
 
-    public void removeCommunity(String name, String contact, String email) {
+    public void removeCommunity(String login) {
         // TODO
     }
+
+    public void removeText(String id) {
+        // TODO
+    }
+
+    public void removeGeneral(String id){
+        // TODO
+    }
+
+    public List<User> searchUser(String name){
+        List<User> result = users
+                .stream()
+                .filter(u -> u.name.equals(name))
+                .collect(Collectors.toList());
+
+        return result;
+    }
+
+    public Optional<User> searchUser(int login){
+        return users
+                .stream()
+                .filter(u -> u.login.equals(login))
+                .findFirst();
+    }
+
+    public List<Book> searchBook(String title){
+        List<Book> result = books
+                .stream()
+                .filter(b -> b.title.equals(title))
+                .collect(Collectors.toList());
+
+        return result;
+    }
+
+    public Optional<Book> searchBook(int id){
+        return books
+                .stream()
+                .filter(b -> b.id == id)
+                .findFirst();
+    }
+
+    public Optional<Loan> searchLoan(int id){
+         return loans
+                 .stream()
+                 .filter(l -> l.id == id)
+                 .findFirst();
+    }
+
 }

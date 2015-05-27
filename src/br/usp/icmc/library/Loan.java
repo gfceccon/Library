@@ -5,10 +5,10 @@ import java.time.LocalDate;
 public class Loan implements CSVSerializable
 {
 	public int id;
-	private User user;
-	private Book book;
-	private LocalDate loanDate;
-	private LocalDate returnDate;
+	public User user;
+	public Book book;
+	public LocalDate loanDate;
+	public LocalDate returnDate;
 
 	public Loan(int id, User u, Book b, LocalDate date) throws Exception
 	{
@@ -16,7 +16,6 @@ public class Loan implements CSVSerializable
 		this.user = u;
 		this.book = b;
 		this.loanDate = date;
-		this.returnDate = date.plusDays(u.maxLoanTime);
 	}
 
 	@Override
@@ -38,3 +37,4 @@ public class Loan implements CSVSerializable
 		return 5;
 	}
 }
+
