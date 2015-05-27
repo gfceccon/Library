@@ -8,16 +8,10 @@ import java.time.LocalDateTime;
 public class Loan implements CSVSerializable
 {
 	public int id;
-	private User user;
-	private Book book;
-	private LocalDateTime loanDate;
-	private LocalDateTime returnDate;
-
-	public Loan(User u, Book b, LocalDateTime date) throws Exception
-	{
-		if(u == null || b == null || date == null)
-			throw new IllegalArgumentException("Null argument");
-	}
+	public User user;
+	public Book book;
+	public LocalDateTime loanDate;
+	public LocalDateTime returnDate;
 
 	@Override
 	public void parse(String[] args) throws Exception
@@ -27,7 +21,7 @@ public class Loan implements CSVSerializable
 	}
 
 	@Override
-	public String toCSV() throws Exception
+	public String[] toCSV() throws Exception
 	{
 		return null;
 	}
