@@ -5,18 +5,12 @@ import java.time.LocalDate;
 public class Loan implements CSVSerializable
 {
 	public int id;
-	public User user;
-	public Book book;
+	public String userLogin;
+	public String userName;
+	public int bookId;
+	public String bookTitle;
 	public LocalDate loanDate;
 	public LocalDate returnDate;
-
-	public Loan(int id, User u, Book b, LocalDate date) throws Exception
-	{
-		this.id = id;
-		this.user = u;
-		this.book = b;
-		this.loanDate = date;
-	}
 
 	@Override
 	public void parse(String[] args) throws Exception

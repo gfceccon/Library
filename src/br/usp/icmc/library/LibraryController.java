@@ -54,7 +54,7 @@ public class LibraryController {
 
                 if(loans    // Se o usuário já tiver emprestado o máximo de livros possíveis
                         .stream()
-                        .filter(l -> l.user.login.equals(userLogin))
+                        .filter(l -> l.userLogin.equals(userLogin))
                         .filter(l -> l.returnDate == null)
                         .count() == user.get().maxBookCount)
                     throw new Exception("User can't borrow more books!");
@@ -62,7 +62,14 @@ public class LibraryController {
                 user.get().maxBookCount++;
                 book.get().isAvailable = false;
 
-                Loan newLoan = new Loan(loans.size(), user.get(), book.get(), currentDate);
+                Loan newLoan = new Loan();
+                newLoan.id = loans.size();
+                newLoan.userLogin = user.get().login;
+                newLoan.userName = user.get().name;
+                newLoan.bookId = book.get().id;
+                newLoan.bookTitle = book.get().title;
+                newLoan.loanDate = currentDate;
+
                 newLoan.toCSV();
 
                 loans.add(newLoan);
@@ -80,15 +87,17 @@ public class LibraryController {
             throw new IllegalArgumentException("Invalid loan ID!");
 
         Loan loan = loans.get(loanId);
+        User user = searchUserByLogin(loan.userLogin).get();
+        Book book = searchBook(loan.bookId).get();
 
-        if(currentDate.compareTo(loan.loanDate.plusDays(loan.user.maxLoanTime)) > 0){
+        if(currentDate.compareTo(loan.loanDate.plusDays(user.maxLoanTime)) > 0){
             // Se a data atual é maior que a data máxima de devolução, calcula o tempo de suspensão do usuário
-            loan.user.setBanDate(currentDate.plusDays(Period.between(loan.loanDate.plusDays(loan.user.maxLoanTime), currentDate).getDays()));
+            user.setBanDate(currentDate.plusDays(Period.between(loan.loanDate.plusDays(user.maxLoanTime), currentDate).getDays()));
         }
 
         loan.returnDate = currentDate;
-        loan.user.maxBookCount--;
-        loan.book.isAvailable = true;
+        user.maxBookCount--;
+        book.isAvailable = true;
 
         loan.toCSV();
     }
@@ -101,9 +110,7 @@ public class LibraryController {
 
         if(!user.isPresent()){
             Student newStudent = new Student();
-
             newStudent.login = login;
-
             newStudent.name = name;
             newStudent.contact = contact;
             newStudent.email = email;
@@ -125,9 +132,7 @@ public class LibraryController {
 
         if(!user.isPresent()){
             Teacher newTeacher = new Teacher();
-
             newTeacher.login = login;
-
             newTeacher.name = name;
             newTeacher.contact = contact;
             newTeacher.email = email;
@@ -149,9 +154,7 @@ public class LibraryController {
 
         if(!user.isPresent()){
             Community newCommunity = new Community();
-
             newCommunity.login = login;
-
             newCommunity.name = name;
             newCommunity.contact = contact;
             newCommunity.email = email;
@@ -165,59 +168,59 @@ public class LibraryController {
         }
     }
 
-    public Text addText(String title){
+    public Text addText(String title) throws Exception {
         int nextId = 0;
 
         if(books.size() > 0)
             nextId = books.get(books.size() - 1).id + 1;
 
         Text newText = new Text();
-
         newText.id = nextId;
         newText.title = title;
-        
-        books.add(newText);
 
+        newText.toCSV();
+
+        books.add(newText);
         return newText;
     }
 
-    public General addGeneral(String title){
+    public General addGeneral(String title) throws Exception{
         int nextId = 0;
 
         if(books.size() > 0)
             nextId = books.get(books.size() - 1).id + 1;
 
         General newGeneral = new General();
-
         newGeneral.id = nextId;
         newGeneral.title = title;
 
-        books.add(newGeneral);
+        newGeneral.toCSV();
 
+        books.add(newGeneral);
         return newGeneral;
     }
 
     public void removeStudent(String login) {
-        // TODO
+        // TODO, also need to treat the according exceptions in functions loanBook() and returnBook()
     }
 
     public void removeTeacher(String login) {
-        // TODO
+        // TODO, also need to treat the according exceptions in functions loanBook() and returnBook()
     }
 
     public void removeCommunity(String login) {
-        // TODO
+        // TODO, also need to treat the according exceptions in functions loanBook() and returnBook()
     }
 
     public void removeText(String id) {
-        // TODO
+        // TODO, also need to treat the according exceptions in functions loanBook() and returnBook()
     }
 
     public void removeGeneral(String id){
-        // TODO
+        // TODO, also need to treat the according exceptions in functions loanBook() and returnBook()
     }
 
-    public List<User> searchUser(String name){
+    public List<User> searchUserByName(String name){
         List<User> result = users
                 .stream()
                 .filter(u -> u.name.equals(name))
@@ -226,7 +229,7 @@ public class LibraryController {
         return result;
     }
 
-    public Optional<User> searchUser(int login){
+    public Optional<User> searchUserByLogin(String login){
         return users
                 .stream()
                 .filter(u -> u.login.equals(login))
