@@ -1,10 +1,12 @@
 package br.usp.icmc.library;
 
-/**
- * Created by Ceccon on 26/05/2015.
- */
 public class Teacher extends User
 {
+	public Teacher(){
+		maxBookCount = 6;
+		maxLoanTime = 60;
+	}
+
 	@Override
 	public void parse(String[] args) throws Exception
 	{

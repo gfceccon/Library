@@ -1,26 +1,25 @@
 package br.usp.icmc.library;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 
-/**
- * Created by Ceccon on 26/05/2015.
- */
 public abstract class User implements CSVSerializable
 {
-	public int id;
+	public String login;
 	public String name;
 	public String contact;
 	public String email;
+	public int maxBookCount;
+	public int maxLoanTime;
 
-	private LocalDateTime banDate;
+	private LocalDate banDate;
 
-	public void setBanDate(LocalDateTime newBanDate)
+	public void setBanDate(LocalDate newBanDate)
 	{
 		if(newBanDate != null)
 			this.banDate = newBanDate;
 	}
 
-	public LocalDateTime getBanDate()
+	public LocalDate getBanDate()
 	{
 		return this.banDate;
 	}

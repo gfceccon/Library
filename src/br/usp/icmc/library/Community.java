@@ -1,10 +1,12 @@
 package br.usp.icmc.library;
 
-/**
- * Created by Ceccon on 26/05/2015.
- */
 public class Community extends User
 {
+	public Community(){
+		maxBookCount = 2;
+		maxLoanTime = 15;
+	}
+
 	@Override
 	public void parse(String[] args) throws Exception
 	{

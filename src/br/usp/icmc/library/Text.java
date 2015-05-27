@@ -1,10 +1,11 @@
 package br.usp.icmc.library;
 
-/**
- * Created by Ceccon on 26/05/2015.
- */
 public class Text extends Book
 {
+	public Text(){
+		this.isAvailable = true;
+	}
+
 	@Override
 	public void parse(String[] args) throws Exception
 	{
