@@ -19,7 +19,7 @@ public class LibraryController {
     }
 
     public static LibraryController getInstance() {
-        if (instance == null)
+        if (instance == null) // Esta classe é uma Singleton pois deve ser instanciada apenas uma vez
             instance = new LibraryController();
         return instance;
     }
@@ -31,15 +31,8 @@ public class LibraryController {
     }
 
     public Loan lendBook(int bookId, String userLogin) throws Exception{
-        Optional<Book> book = books
-            .stream()
-            .filter(b -> b.id == bookId)
-            .findFirst();                   // Procura pelo livro a partir do id fornecido
-
-        Optional<User> user = users
-            .stream()
-            .filter(u -> u.login.equals(userLogin))
-            .findFirst();                   // Procura pelo usuário a partir do login fornecido
+        Optional<Book> book = searchBook(bookId); // Procura pelo livro a partir do id fornecido
+        Optional<User> user = searchUserByLogin(userLogin); // Procura pelo usuário a partir do login fornecido
 
         if(user.isPresent()){
             if(book.isPresent()){
@@ -62,17 +55,12 @@ public class LibraryController {
                 user.get().maxBookCount++;
                 book.get().isAvailable = false;
 
-                Loan newLoan = new Loan();
-                newLoan.id = loans.size();
-                newLoan.userLogin = user.get().login;
-                newLoan.userName = user.get().name;
-                newLoan.bookId = book.get().id;
-                newLoan.bookTitle = book.get().title;
-                newLoan.loanDate = currentDate;
+                // Cria um novo empréstimo com os dados passados
+                Loan newLoan = new Loan(loans.size(), user.get().login, user.get().name, book.get().id, book.get().title, currentDate);
 
                 newLoan.toCSV();
-
                 loans.add(newLoan);
+
                 return newLoan;
             } else {
                 throw new IllegalArgumentException("Invalid book ID!");
@@ -86,9 +74,9 @@ public class LibraryController {
         if(loanId < 0 || loanId > loans.size() - 1)
             throw new IllegalArgumentException("Invalid loan ID!");
 
-        Loan loan = loans.get(loanId);
-        User user = searchUserByLogin(loan.userLogin).get();
-        Book book = searchBook(loan.bookId).get();
+        Loan loan = loans.get(loanId); // Recupera o respectivo empréstimo a partir do id fornecido
+        Book book = searchBook(loan.bookId).get(); // Procura pelo livro a partir do id presente no empréstimo
+        User user = searchUserByLogin(loan.userLogin).get(); // Procura pelo usuário a partir do login presente no empréstimo
 
         if(currentDate.compareTo(loan.loanDate.plusDays(user.maxLoanTime)) > 0){
             // Se a data atual é maior que a data máxima de devolução, calcula o tempo de suspensão do usuário
@@ -103,21 +91,14 @@ public class LibraryController {
     }
 
     public Student addStudent(String login, String name, String contact, String email) throws Exception {
-        Optional<User> user = users
-            .stream()
-            .filter(u -> u.login.equals(login))
-            .findFirst();
+        Optional<User> user = searchUserByLogin(login); // Procura pelo usuário a partir do login fornecido
 
-        if(!user.isPresent()){
-            Student newStudent = new Student();
-            newStudent.login = login;
-            newStudent.name = name;
-            newStudent.contact = contact;
-            newStudent.email = email;
+        if(!user.isPresent()){ // Caso o usuário não esteja presente na lista de usuários
+            Student newStudent = new Student(login, name, contact, email); // Instancia um novo usuário
 
             newStudent.toCSV();
+            users.add(newStudent); // Adiciona o usuário ao arquivo CSV e à lista em memória
 
-            users.add(newStudent);
             return newStudent;
         } else {
             throw new Exception("Duplicated login!");
@@ -125,21 +106,14 @@ public class LibraryController {
     }
 
     public Teacher addTeacher(String login, String name, String contact, String email) throws Exception {
-        Optional<User> user = users
-                .stream()
-                .filter(u -> u.login.equals(login))
-                .findFirst();
+        Optional<User> user = searchUserByLogin(login);
 
-        if(!user.isPresent()){
-            Teacher newTeacher = new Teacher();
-            newTeacher.login = login;
-            newTeacher.name = name;
-            newTeacher.contact = contact;
-            newTeacher.email = email;
+        if(!user.isPresent()){ // Caso o usuário não esteja presente na lista de usuários
+            Teacher newTeacher = new Teacher(login, name, contact, email); // Instancia um novo usuário
 
             newTeacher.toCSV();
+            users.add(newTeacher); // Adiciona o usuário ao arquivo CSV e à lista em memória
 
-            users.add(newTeacher);
             return newTeacher;
         } else {
             throw new Exception("Duplicated login!");
@@ -147,21 +121,14 @@ public class LibraryController {
     }
 
     public Community addCommunity(String login, String name, String contact, String email) throws Exception {
-        Optional<User> user = users
-                .stream()
-                .filter(u -> u.login.equals(login))
-                .findFirst();
+        Optional<User> user = searchUserByLogin(login);
 
-        if(!user.isPresent()){
-            Community newCommunity = new Community();
-            newCommunity.login = login;
-            newCommunity.name = name;
-            newCommunity.contact = contact;
-            newCommunity.email = email;
+        if(!user.isPresent()){ // Caso o usuário não esteja presente na lista de usuários
+            Community newCommunity = new Community(login, name, contact, email); // Instancia um novo usuário
 
             newCommunity.toCSV();
+            users.add(newCommunity); // Adiciona o usuário ao arquivo CSV e à lista em memória
 
-            users.add(newCommunity);
             return newCommunity;
         } else {
             throw new Exception("Duplicated login!");
@@ -171,33 +138,28 @@ public class LibraryController {
     public Text addText(String title) throws Exception {
         int nextId = 0;
 
-        if(books.size() > 0) {
+        if(books.size() > 0) // Se a lista de livros não é vazia, encontra o id correto para o novo livro
             nextId = books.get(books.size() - 1).id + 1;
-        }
 
-        Text newText = new Text();
-        newText.id = nextId;
-        newText.title = title;
+        Text newText = new Text(nextId, title); // Instancia um novo livro
 
         newText.toCSV();
+        books.add(newText); // Adiciona o livro ao arquivo CSV e à lista em memória
 
-        books.add(newText);
         return newText;
     }
 
     public General addGeneral(String title) throws Exception{
         int nextId = 0;
 
-        if(books.size() > 0)
+        if(books.size() > 0) // Se a lista de livros não é vazia, encontra o id correto para o novo livro
             nextId = books.get(books.size() - 1).id + 1;
 
-        General newGeneral = new General();
-        newGeneral.id = nextId;
-        newGeneral.title = title;
+        General newGeneral = new General(nextId, title); // Instancia um novo livro
 
         newGeneral.toCSV();
+        books.add(newGeneral); // Adiciona o livro ao arquivo CSV e à lista em memória
 
-        books.add(newGeneral);
         return newGeneral;
     }
 

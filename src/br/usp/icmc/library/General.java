@@ -3,7 +3,14 @@ package br.usp.icmc.library;
 public class General extends Book
 {
 	public General(){
-		this.isAvailable = true;
+		isAvailable = true;
+	}
+
+	public General(int id, String title){
+		this.id = id;
+		this.title = title;
+
+		isAvailable = true;
 	}
 
 	@Override

@@ -9,6 +9,16 @@ public class Student extends User
 		maxLoanTime = 15;
 	}
 
+	public Student(String login, String name, String contact, String email){
+		this.login = login;
+		this.name = name;
+		this.contact = contact;
+		this.email = email;
+
+		maxBookCount = 4;
+		maxLoanTime = 15;
+	}
+
 	@Override
 	public void parse(String[] args) throws Exception
 	{

@@ -9,6 +9,16 @@ public class Community extends User
 		maxLoanTime = 15;
 	}
 
+	public Community(String login, String name, String contact, String email){
+		this.login = login;
+		this.name = name;
+		this.contact = contact;
+		this.email = email;
+
+		maxBookCount = 2;
+		maxLoanTime = 15;
+	}
+
 	@Override
 	public void parse(String[] args) throws Exception
 	{

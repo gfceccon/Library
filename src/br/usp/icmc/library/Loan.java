@@ -12,6 +12,18 @@ public class Loan implements CSVSerializable
 	public LocalDate loanDate;
 	public LocalDate returnDate;
 
+	public Loan(){}
+
+	public Loan(int id, String userLogin, String userName, int bookId, String bookTitle, LocalDate loanDate){
+		this.id = id;
+		this.userLogin= userLogin;
+		this.userName = userName;
+		this.bookId = bookId;
+		this.bookTitle = bookTitle;
+		this.loanDate = loanDate;
+	}
+
+
 	@Override
 	public void parse(String[] args) throws Exception
 	{

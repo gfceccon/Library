@@ -1,16 +1,20 @@
 package br.usp.icmc.library;
 
-<<<<<<< HEAD
-=======
 import java.time.format.DateTimeFormatter;
 
-/**
- * Created by Ceccon on 26/05/2015.
- */
->>>>>>> origin/CSVSerializables
 public class Teacher extends User
 {
 	public Teacher(){
+		maxBookCount = 6;
+		maxLoanTime = 60;
+	}
+
+	public Teacher(String login, String name, String contact, String email){
+		this.login = login;
+		this.name = name;
+		this.contact = contact;
+		this.email = email;
+
 		maxBookCount = 6;
 		maxLoanTime = 60;
 	}

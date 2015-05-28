@@ -3,7 +3,14 @@ package br.usp.icmc.library;
 public class Text extends Book
 {
 	public Text(){
-		this.isAvailable = true;
+		isAvailable = true;
+	}
+
+	public Text(int id, String title){
+		this.id = id;
+		this.title = title;
+
+		isAvailable = true;
 	}
 
 	@Override
