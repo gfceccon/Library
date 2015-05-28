@@ -17,39 +17,39 @@ public class LibraryController {
     private static LibraryController instance;
 
     private LibraryController() {
-        users = new ArrayList<User>();
-        books = new ArrayList<Book>();
-        loans = new ArrayList<Loan>();
+        users = new ArrayList<>();
+        books = new ArrayList<>();
+        loans = new ArrayList<>();
     }
 
     public static LibraryController getInstance() {
-        if (instance == null) // Esta classe é uma Singleton pois deve ser instanciada apenas uma vez
+        if (instance == null) // This is a singleton class since it can only be instancied once
             instance = new LibraryController();
         return instance;
     }
 
     public void setDate(LocalDate date) throws Exception {
-        if(date == null)
+        if (date == null)
             throw new IllegalArgumentException("Invalid date!");
         this.currentDate = date;
     }
 
-    public Loan lendBook(int bookId, String userLogin) throws Exception{
-        Optional<Book> book = searchBook(bookId); // Procura pelo livro a partir do id fornecido
-        Optional<User> user = searchUserByLogin(userLogin); // Procura pelo usuário a partir do login fornecido
+    public Loan lendBook(int bookId, String userLogin) throws Exception {
+        Optional<Book> book = searchBook(bookId); // Search for the book by the given id
+        Optional<User> user = searchUserByLogin(userLogin); // Search for the user by the given login
 
-        if(user.isPresent()){
-            if(book.isPresent()){
-                if(!book.get().isAvailable)     // Se o livro já estiver emprestado
+        if (user.isPresent()) {
+            if (book.isPresent()) {
+                if (!book.get().isAvailable)     // If the book is already lent
                     throw new Exception("This book was already lent!");
 
-                if(user.get().getBanDate() != null) // Se o usuário estiver banido
+                if (user.get().getBanDate() != null) // If the user is banned
                     throw new Exception("This user is banned until " + user.get().getBanDate().format(DateTimeFormatter.ofPattern("dd'/'MM'/'yyyy")) + "!");
 
-                if(book.get() instanceof Text && user.get() instanceof Community)
+                if (book.get() instanceof Text && user.get() instanceof Community) // If a community user tries to borrow a text book
                     throw new Exception("Community user can't borrow text books!");
 
-                if(loans    // Se o usuário já tiver emprestado o máximo de livros possíveis
+                if (loans    // If the user has already borrowed the maximum ammount of books allowed
                         .stream()
                         .filter(l -> l.userLogin.equals(userLogin))
                         .filter(l -> l.returnDate == null)
@@ -59,7 +59,7 @@ public class LibraryController {
                 user.get().maxBookCount++;
                 book.get().isAvailable = false;
 
-                // Cria um novo empréstimo com os dados passados
+                // Creates a new loan object with the given info
                 Loan newLoan = new Loan(loans.size(), user.get().login, user.get().name, book.get().id, book.get().title, currentDate);
 
                 newLoan.toCSV();
@@ -75,15 +75,15 @@ public class LibraryController {
     }
 
     public void returnBook(int loanId) throws Exception {
-        if(loanId < 0 || loanId > loans.size() - 1)
+        if (loanId < 0 || loanId > loans.size() - 1)
             throw new IllegalArgumentException("Invalid loan ID!");
 
-        Loan loan = loans.get(loanId); // Recupera o respectivo empréstimo a partir do id fornecido
-        Book book = searchBook(loan.bookId).get(); // Procura pelo livro a partir do id presente no empréstimo
-        User user = searchUserByLogin(loan.userLogin).get(); // Procura pelo usuário a partir do login presente no empréstimo
+        Loan loan = loans.get(loanId); // Get the respective loan by the given id
+        Book book = searchBook(loan.bookId).get(); // Search for the book by the id from the loan
+        User user = searchUserByLogin(loan.userLogin).get(); // Search for the user by the login from the loan
 
-        if(currentDate.compareTo(loan.loanDate.plusDays(user.maxLoanTime)) > 0){
-            // Se a data atual é maior que a data máxima de devolução, calcula o tempo de suspensão do usuário
+        if (currentDate.compareTo(loan.loanDate.plusDays(user.maxLoanTime)) > 0) {
+            // If the actual date is greater than the maximum return date, computes the ban time
             user.setBanDate(currentDate.plusDays(Period.between(loan.loanDate.plusDays(user.maxLoanTime), currentDate).getDays()));
         }
 
@@ -95,13 +95,13 @@ public class LibraryController {
     }
 
     public Student addStudent(String login, String name, String contact, String email) throws Exception {
-        Optional<User> user = searchUserByLogin(login); // Procura pelo usuário a partir do login fornecido
+        Optional<User> user = searchUserByLogin(login); // Search for the user by the given login
 
-        if(!user.isPresent()){ // Caso o usuário não esteja presente na lista de usuários
-            Student newStudent = new Student(login, name, contact, email); // Instancia um novo usuário
+        if (!user.isPresent()) { // If the search didn`t return any results
+            Student newStudent = new Student(login, name, contact, email); // Instantiates a new user
 
             newStudent.toCSV();
-            users.add(newStudent); // Adiciona o usuário ao arquivo CSV e à lista em memória
+            users.add(newStudent); // Adds the user to the CSV file and the list in memory
 
             return newStudent;
         } else {
@@ -112,11 +112,11 @@ public class LibraryController {
     public Teacher addTeacher(String login, String name, String contact, String email) throws Exception {
         Optional<User> user = searchUserByLogin(login);
 
-        if(!user.isPresent()){ // Caso o usuário não esteja presente na lista de usuários
-            Teacher newTeacher = new Teacher(login, name, contact, email); // Instancia um novo usuário
+        if (!user.isPresent()) { // If the search didn`t return any results
+            Teacher newTeacher = new Teacher(login, name, contact, email); // Instantiates a new user
 
             newTeacher.toCSV();
-            users.add(newTeacher); // Adiciona o usuário ao arquivo CSV e à lista em memória
+            users.add(newTeacher); // Adds the user to the CSV file and the list in memory
 
             return newTeacher;
         } else {
@@ -127,11 +127,11 @@ public class LibraryController {
     public Community addCommunity(String login, String name, String contact, String email) throws Exception {
         Optional<User> user = searchUserByLogin(login);
 
-        if(!user.isPresent()){ // Caso o usuário não esteja presente na lista de usuários
-            Community newCommunity = new Community(login, name, contact, email); // Instancia um novo usuário
+        if (!user.isPresent()) { // If the search didn`t return any results
+            Community newCommunity = new Community(login, name, contact, email); // Instantiates a new user
 
             newCommunity.toCSV();
-            users.add(newCommunity); // Adiciona o usuário ao arquivo CSV e à lista em memória
+            users.add(newCommunity); // Adds the user to the CSV file and the list in memory
 
             return newCommunity;
         } else {
@@ -142,27 +142,27 @@ public class LibraryController {
     public Text addText(String title) throws Exception {
         int nextId = 0;
 
-        if(books.size() > 0) // Se a lista de livros não é vazia, encontra o id correto para o novo livro
+        if (books.size() > 0) // If the books list isn`t empty, finds the correct id for the new book
             nextId = books.get(books.size() - 1).id + 1;
 
-        Text newText = new Text(nextId, title); // Instancia um novo livro
+        Text newText = new Text(nextId, title); // Instantiates a new book
 
         newText.toCSV();
-        books.add(newText); // Adiciona o livro ao arquivo CSV e à lista em memória
+        books.add(newText); // Adds the user to the CSV file and the list in memory
 
         return newText;
     }
 
-    public General addGeneral(String title) throws Exception{
+    public General addGeneral(String title) throws Exception {
         int nextId = 0;
 
-        if(books.size() > 0) // Se a lista de livros não é vazia, encontra o id correto para o novo livro
+        if (books.size() > 0) // If the books list isn`t empty, finds the correct id for the new book
             nextId = books.get(books.size() - 1).id + 1;
 
-        General newGeneral = new General(nextId, title); // Instancia um novo livro
+        General newGeneral = new General(nextId, title); // Instantiates a new book
 
         newGeneral.toCSV();
-        books.add(newGeneral); // Adiciona o livro ao arquivo CSV e à lista em memória
+        books.add(newGeneral); // Adds the user to the CSV file and the list in memory
 
         return newGeneral;
     }
@@ -183,11 +183,11 @@ public class LibraryController {
         // TODO, also need to treat the according exceptions in functions loanBook() and returnBook()
     }
 
-    public void removeGeneral(String id){
+    public void removeGeneral(String id) {
         // TODO, also need to treat the according exceptions in functions loanBook() and returnBook()
     }
 
-    public List<User> searchUserByName(String name){
+    public List<User> searchUserByName(String name) {
         List<User> result = users
                 .stream()
                 .filter(u -> u.name.equals(name))
@@ -196,14 +196,14 @@ public class LibraryController {
         return result;
     }
 
-    public Optional<User> searchUserByLogin(String login){
+    public Optional<User> searchUserByLogin(String login) {
         return users
                 .stream()
                 .filter(u -> u.login.equals(login))
                 .findFirst();
     }
 
-    public List<Book> searchBook(String title){
+    public List<Book> searchBook(String title) {
         List<Book> result = books
                 .stream()
                 .filter(b -> b.title.equals(title))
@@ -212,18 +212,18 @@ public class LibraryController {
         return result;
     }
 
-    public Optional<Book> searchBook(int id){
+    public Optional<Book> searchBook(int id) {
         return books
                 .stream()
                 .filter(b -> b.id == id)
                 .findFirst();
     }
 
-    public Optional<Loan> searchLoan(int id){
-         return loans
-                 .stream()
-                 .filter(l -> l.id == id)
-                 .findFirst();
+    public Optional<Loan> searchLoan(int id) {
+        return loans
+                .stream()
+                .filter(l -> l.id == id)
+                .findFirst();
     }
 
     public List<Book> getBooks() {
@@ -234,8 +234,7 @@ public class LibraryController {
         return loans;
     }
 
-    public List<User> getUsers()
-    {
+    public List<User> getUsers() {
         return users;
     }
 }
