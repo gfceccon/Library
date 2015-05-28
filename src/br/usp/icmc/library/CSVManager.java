@@ -1,7 +1,8 @@
 package br.usp.icmc.library;
 
-import java.io.BufferedReader;
-import java.io.FileReader;
+import jdk.internal.org.objectweb.asm.util.Printer;
+
+import java.io.*;
 import java.util.*;
 
 public class CSVManager
@@ -71,6 +72,32 @@ public class CSVManager
 
         return l;
     }
+
+    public void writeFile(String fp, List<CSVSerializable> l)
+    {
+        try
+        {
+            BufferedWriter writer = new BufferedWriter(new FileWriter(fp));
+            for(CSVSerializable item : l)
+            {
+                try
+                {
+                    String[] arguments = item.toCSV();
+                    writer.write(String.join(",", arguments));
+                    writer.newLine();
+                }
+                catch (Exception e)
+                {
+                    e.printStackTrace();
+                }
+            }
+        }
+        catch (IOException e)
+        {
+            e.printStackTrace();
+        }
+    }
+
 
     private User parseUser(String csv)
     {
