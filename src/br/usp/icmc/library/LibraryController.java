@@ -3,6 +3,7 @@ package br.usp.icmc.library;
 import java.time.LocalDate;
 import java.time.Period;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -16,6 +17,9 @@ public class LibraryController {
     private static LibraryController instance;
 
     private LibraryController() {
+        users = new ArrayList<User>();
+        books = new ArrayList<Book>();
+        loans = new ArrayList<Loan>();
     }
 
     public static LibraryController getInstance() {
@@ -220,5 +224,18 @@ public class LibraryController {
                  .stream()
                  .filter(l -> l.id == id)
                  .findFirst();
+    }
+
+    public List<Book> getBooks() {
+        return books;
+    }
+
+    public List<Loan> getLoans() {
+        return loans;
+    }
+
+    public List<User> getUsers()
+    {
+        return users;
     }
 }

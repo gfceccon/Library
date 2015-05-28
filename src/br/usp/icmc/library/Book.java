@@ -6,6 +6,30 @@ public abstract class Book implements CSVSerializable
 	public String title;
 	public boolean isAvailable;
 
+	public int getId() {
+		return id;
+	}
+
+	public void setId(int id) {
+		this.id = id;
+	}
+
+	public String getTitle() {
+		return title;
+	}
+
+	public void setTitle(String title) {
+		this.title = title;
+	}
+
+	public boolean getIsAvailable() {
+		return isAvailable;
+	}
+
+	public void setIsAvailable(boolean isAvailable) {
+		this.isAvailable = isAvailable;
+	}
+
 	@Override
 	public void parse(String[] args) throws Exception
 	{

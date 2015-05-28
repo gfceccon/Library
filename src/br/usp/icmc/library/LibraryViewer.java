@@ -1,10 +1,14 @@
 package br.usp.icmc.library;
 
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableArray;
+import javafx.collections.ObservableList;
 import javafx.scene.Scene;
 import javafx.scene.control.Label;
 import javafx.scene.control.TabPane;
 import javafx.scene.control.TableView;
 import javafx.scene.control.*;
+import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
@@ -17,9 +21,9 @@ public class LibraryViewer extends Scene
 {
 	private LibraryController controller;
 
-	private TableView users;
-	private TableView books;
-	private TableView loans;
+	private TableView<User> users;
+	private TableView<Book> books;
+	private TableView<Loan> loans;
 
 	public LibraryViewer(Pane pane, LocalDate date)
 	{
@@ -33,23 +37,18 @@ public class LibraryViewer extends Scene
 			System.out.println(e.getMessage());
 			System.out.println(e.getStackTrace());
 		}
-		users = new TableView();
-		books = new TableView();
-		loans = new TableView();
-
-		controller = LibraryController.getInstance();
-		try
-		{
-			controller.setDate(date);
-		}catch(Exception e)
-		{
-
-		}
+		users = new TableView<User>();
+		books = new TableView<Book>();
+		loans = new TableView<Loan>();
 
 		TableColumn userId = new TableColumn("Login");
+		userId.setCellValueFactory(new PropertyValueFactory<User, String>("login"));
 		TableColumn name = new TableColumn("Name");
+		name.setCellValueFactory(new PropertyValueFactory<User, String>("name"));
 		TableColumn contact = new TableColumn("Contact");
+		contact.setCellValueFactory(new PropertyValueFactory<User, String>("contact"));
 		TableColumn email = new TableColumn("E-mail");
+		email.setCellValueFactory(new PropertyValueFactory<User, String>("email"));
 
 		users.getColumns().addAll(userId, name, contact, email);
 
@@ -64,8 +63,11 @@ public class LibraryViewer extends Scene
 
 
 		TableColumn bookId = new TableColumn("ID");
+		bookId.setCellValueFactory(new PropertyValueFactory<Book, Integer>("id"));
 		TableColumn title = new TableColumn("Title");
+		title.setCellValueFactory(new PropertyValueFactory<Book, String>("title"));
 		TableColumn availability = new TableColumn("Availability");
+		availability.setCellValueFactory(new PropertyValueFactory<Book, Boolean>("isAvailable"));
 
 		books.getColumns().addAll(bookId, title, availability);
 
@@ -80,12 +82,17 @@ public class LibraryViewer extends Scene
 		booksTab.setClosable(false);
 
 		TableColumn loanId = new TableColumn("ID");
-		TableColumn loanUserId = new TableColumn("User ID");
-		TableColumn loaBookId = new TableColumn("Book ID");
+		loanId.setCellValueFactory(new PropertyValueFactory<Loan, Integer>("id"));
+		TableColumn loanUserName = new TableColumn("User ID");
+		loanUserName.setCellValueFactory(new PropertyValueFactory<Loan, String>("userName"));
+		TableColumn loanBookTitle = new TableColumn("Book ID");
+		loanBookTitle.setCellValueFactory(new PropertyValueFactory<Loan, String>("bookTitle"));
 		TableColumn loanDate = new TableColumn("Loan Date");
+		loanDate.setCellValueFactory(new PropertyValueFactory<Loan, LocalDate>("loanDate"));
 		TableColumn returnDate = new TableColumn("Return Date");
+		returnDate.setCellValueFactory(new PropertyValueFactory<Loan, LocalDate>("returnDate"));
 
-		loans.getColumns().addAll(loanId, loanUserId, loaBookId, loanDate, returnDate);
+		loans.getColumns().addAll(loanId, loanUserName, loanBookTitle, loanDate, returnDate);
 
 		Label loanSearchLabel = new Label("Search Loan Date: ");
 		DatePicker loanSearch = new DatePicker();
@@ -106,13 +113,26 @@ public class LibraryViewer extends Scene
 		verticalPane.setPrefWidth(800);
 		verticalPane.setPrefHeight(600);
 		pane.getChildren().add(verticalPane);
+
+		fillTable();
 	}
 
 		private void fillTable()
 		{
-			//List<User> usersList = controller.getUsers();
-			//List<Book> booksList = controller.getBooks();
-			//List<Loan> loansList = controller.getLoans();
+			List<User> usersList = controller.getUsers();
+			List<Book> booksList = controller.getBooks();
+			List<Loan> loansList = controller.getLoans();
+			usersList.add(new Student("login", "name", "contact", "email"));
+			booksList.add(new Text(98, "asd"));
+			loansList.add(new Loan(123, "login", "name", 98, "asd", LocalDate.now()));
+
+			ObservableList<User> obsUsers = FXCollections.observableArrayList(usersList);
+			ObservableList<Book> obsBook = FXCollections.observableArrayList(booksList);
+			ObservableList<Loan> obsLoan = FXCollections.observableArrayList(loansList);
+
+			users.setItems(obsUsers);
+			books.setItems(obsBook);
+			loans.setItems(obsLoan);
 
 		}
 
