@@ -3,101 +3,96 @@ package br.usp.icmc.library;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 
-public class Loan implements CSVSerializable
-{
-	public int id;
-	public String userLogin;
-	public String userName;
-	public int bookId;
-	public String bookTitle;
-	public LocalDate loanDate;
+public class Loan implements CSVSerializable {
+    public int id;
+    public String userLogin;
+    public String userName;
+    public int bookId;
+    public String bookTitle;
+    public LocalDate loanDate;
+    public LocalDate returnDate;
 
-	public int getId() {
-		return id;
-	}
+    public Loan() {
+    }
 
-	public void setId(int id) {
-		this.id = id;
-	}
+    public Loan(int id, String userLogin, String userName, int bookId, String bookTitle, LocalDate loanDate) {
+        this.id = id;
+        this.userLogin = userLogin;
+        this.userName = userName;
+        this.bookId = bookId;
+        this.bookTitle = bookTitle;
+        this.loanDate = loanDate;
+    }
 
-	public String getUserLogin() {
-		return userLogin;
-	}
+    public int getId() {
+        return id;
+    }
 
-	public void setUserLogin(String userLogin) {
-		this.userLogin = userLogin;
-	}
+    public void setId(int id) {
+        this.id = id;
+    }
 
-	public String getUserName() {
-		return userName;
-	}
+    public String getUserLogin() {
+        return userLogin;
+    }
 
-	public void setUserName(String userName) {
-		this.userName = userName;
-	}
+    public void setUserLogin(String userLogin) {
+        this.userLogin = userLogin;
+    }
 
-	public int getBookId() {
-		return bookId;
-	}
+    public String getUserName() {
+        return userName;
+    }
 
-	public void setBookId(int bookId) {
-		this.bookId = bookId;
-	}
+    public void setUserName(String userName) {
+        this.userName = userName;
+    }
 
-	public String getBookTitle() {
-		return bookTitle;
-	}
+    public int getBookId() {
+        return bookId;
+    }
 
-	public void setBookTitle(String bookTitle) {
-		this.bookTitle = bookTitle;
-	}
+    public void setBookId(int bookId) {
+        this.bookId = bookId;
+    }
 
-	public String getLoanDate() {
-			return loanDate.format(DateTimeFormatter.ofPattern("dd/MM/yyyy"));
-	}
+    public String getBookTitle() {
+        return bookTitle;
+    }
 
-	public void setLoanDate(String loanDate) {
-		this.loanDate = LocalDate.parse(loanDate, DateTimeFormatter.ofPattern("dd/MM/yyyy"));
-	}
+    public void setBookTitle(String bookTitle) {
+        this.bookTitle = bookTitle;
+    }
 
-	public String getReturnDate() {
-		return returnDate.format(DateTimeFormatter.ofPattern("dd/MM/yyyy"));
-	}
+    public String getLoanDate() {
+        return loanDate.format(DateTimeFormatter.ofPattern("dd/MM/yyyy"));
+    }
 
-	public void setReturnDate(String returnDate) {
-		this.returnDate = LocalDate.parse(returnDate, DateTimeFormatter.ofPattern("dd/MM/yyyy"));
-	}
+    public void setLoanDate(String loanDate) {
+        this.loanDate = LocalDate.parse(loanDate, DateTimeFormatter.ofPattern("dd/MM/yyyy"));
+    }
 
-	public LocalDate returnDate;
+    public String getReturnDate() {
+        return returnDate.format(DateTimeFormatter.ofPattern("dd/MM/yyyy"));
+    }
 
-	public Loan(){}
+    public void setReturnDate(String returnDate) {
+        this.returnDate = LocalDate.parse(returnDate, DateTimeFormatter.ofPattern("dd/MM/yyyy"));
+    }
 
-	public Loan(int id, String userLogin, String userName, int bookId, String bookTitle, LocalDate loanDate){
-		this.id = id;
-		this.userLogin= userLogin;
-		this.userName = userName;
-		this.bookId = bookId;
-		this.bookTitle = bookTitle;
-		this.loanDate = loanDate;
-	}
+    @Override
+    public void parse(String[] args) throws Exception {
+        if (args.length != getNumberOfArguments())
+            throw new IllegalArgumentException("Wrong number of arguments!");
+    }
 
+    @Override
+    public String[] toCSV() throws Exception {
+        return null;
+    }
 
-	@Override
-	public void parse(String[] args) throws Exception
-	{
-		if(args.length != getNumberOfArguments())
-			throw new IllegalArgumentException("Wrong number of arguments!");
-	}
-
-	@Override
-	public String[] toCSV() throws Exception
-	{
-		return null;
-	}
-
-	@Override
-	public int getNumberOfArguments()
-	{
-		return 5;
-	}
+    @Override
+    public int getNumberOfArguments() {
+        return 5;
+    }
 }

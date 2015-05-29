@@ -9,12 +9,11 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 public class LibraryController {
+    private static LibraryController instance;
     private LocalDate currentDate;
     private List<User> users;
     private List<Book> books;
     private List<Loan> loans;
-
-    private static LibraryController instance;
 
     private LibraryController() {
         users = new ArrayList<>();
@@ -94,11 +93,11 @@ public class LibraryController {
         loan.toCSV();
     }
 
-    public Student addStudent(String login, String name, String contact, String email) throws Exception {
+    public Student addStudent(String login, String name, String contact, String email, String address, String cpf) throws Exception {
         Optional<User> user = searchUserByLogin(login); // Search for the user by the given login
 
         if (!user.isPresent()) { // If the search didn`t return any results
-            Student newStudent = new Student(login, name, contact, email); // Instantiates a new user
+            Student newStudent = new Student(login, name, contact, email, address, cpf); // Instantiates a new user
 
             newStudent.toCSV();
             users.add(newStudent); // Adds the user to the CSV file and the list in memory
@@ -109,11 +108,11 @@ public class LibraryController {
         }
     }
 
-    public Teacher addTeacher(String login, String name, String contact, String email) throws Exception {
+    public Teacher addTeacher(String login, String name, String contact, String email, String address, String cpf) throws Exception {
         Optional<User> user = searchUserByLogin(login);
 
         if (!user.isPresent()) { // If the search didn`t return any results
-            Teacher newTeacher = new Teacher(login, name, contact, email); // Instantiates a new user
+            Teacher newTeacher = new Teacher(login, name, contact, email, address, cpf); // Instantiates a new user
 
             newTeacher.toCSV();
             users.add(newTeacher); // Adds the user to the CSV file and the list in memory
@@ -124,11 +123,11 @@ public class LibraryController {
         }
     }
 
-    public Community addCommunity(String login, String name, String contact, String email) throws Exception {
+    public Community addCommunity(String login, String name, String contact, String email, String address, String cpf) throws Exception {
         Optional<User> user = searchUserByLogin(login);
 
         if (!user.isPresent()) { // If the search didn`t return any results
-            Community newCommunity = new Community(login, name, contact, email); // Instantiates a new user
+            Community newCommunity = new Community(login, name, contact, email, address, cpf); // Instantiates a new user
 
             newCommunity.toCSV();
             users.add(newCommunity); // Adds the user to the CSV file and the list in memory
@@ -139,13 +138,13 @@ public class LibraryController {
         }
     }
 
-    public Text addText(String title) throws Exception {
+    public Text addText(String title, String author, String publisher, int year, int pages) throws Exception {
         int nextId = 0;
 
         if (books.size() > 0) // If the books list isn`t empty, finds the correct id for the new book
             nextId = books.get(books.size() - 1).id + 1;
 
-        Text newText = new Text(nextId, title); // Instantiates a new book
+        Text newText = new Text(nextId, title, author, publisher, year, pages); // Instantiates a new book
 
         newText.toCSV();
         books.add(newText); // Adds the user to the CSV file and the list in memory
@@ -153,13 +152,13 @@ public class LibraryController {
         return newText;
     }
 
-    public General addGeneral(String title) throws Exception {
+    public General addGeneral(String title, String author, String publisher, int year, int pages) throws Exception {
         int nextId = 0;
 
         if (books.size() > 0) // If the books list isn`t empty, finds the correct id for the new book
             nextId = books.get(books.size() - 1).id + 1;
 
-        General newGeneral = new General(nextId, title); // Instantiates a new book
+        General newGeneral = new General(nextId, title, author, publisher, year, pages); // Instantiates a new book
 
         newGeneral.toCSV();
         books.add(newGeneral); // Adds the user to the CSV file and the list in memory
