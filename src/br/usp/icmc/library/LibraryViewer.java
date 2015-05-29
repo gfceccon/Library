@@ -1,7 +1,6 @@
 package br.usp.icmc.library;
 
 import javafx.collections.FXCollections;
-import javafx.collections.ObservableArray;
 import javafx.collections.ObservableList;
 import javafx.scene.Scene;
 import javafx.scene.control.Label;
@@ -25,18 +24,10 @@ public class LibraryViewer extends Scene
 	private TableView<Book> books;
 	private TableView<Loan> loans;
 
-	public LibraryViewer(Pane pane, LocalDate date)
+	public LibraryViewer(Pane pane)
 	{
 		super(pane);
 		controller = LibraryController.getInstance();
-		try
-		{
-			controller.setDate(date);
-		} catch (Exception e)
-		{
-			System.out.println(e.getMessage());
-			System.out.println(e.getStackTrace());
-		}
 		users = new TableView<User>();
 		books = new TableView<Book>();
 		loans = new TableView<Loan>();
@@ -103,7 +94,37 @@ public class LibraryViewer extends Scene
 		loansTab.setClosable(false);
 
 
-		Label currentDate = new Label(date.format(DateTimeFormatter.ofPattern("dd/MM/yyyy")));
+		DatePicker datePicker = new DatePicker();
+		Label currentDate = new Label();
+
+		MenuBar menuBar = new MenuBar();
+		Menu menuFile = new Menu("File");
+		Menu menuOption = new Menu("Option");
+
+		MenuItem menuExportFile = new MenuItem("Export");
+		MenuItem menuImportFile = new MenuItem("Import");
+		MenuItem menuSetDate = new MenuItem("Set Date");
+
+		Alert datePickerModal = new Alert(Alert.AlertType.CONFIRMATION);
+		datePickerModal.setTitle("Choose a date");
+		datePickerModal.getDialogPane().getChildren().add(datePicker);
+		menuSetDate.setOnAction(e -> {
+			datePickerModal.showAndWait();
+
+			//try
+			//{
+			//	controller.setDate(date);
+			//} catch (Exception e)
+			//{
+			//	System.out.println(e.getMessage());
+			//	System.out.println(e.getStackTrace());
+			//}
+		});
+
+		menuFile.getItems().addAll(menuImportFile, menuExportFile);
+		menuOption.getItems().addAll(menuSetDate);
+
+		//date.format(DateTimeFormatter.ofPattern("dd/MM/yyyy"))
 
 
 		TabPane tabPane = new TabPane(usersTab, booksTab, loansTab);
@@ -122,9 +143,6 @@ public class LibraryViewer extends Scene
 			List<User> usersList = controller.getUsers();
 			List<Book> booksList = controller.getBooks();
 			List<Loan> loansList = controller.getLoans();
-			usersList.add(new Student("login", "name", "contact", "email"));
-			booksList.add(new Text(98, "asd"));
-			loansList.add(new Loan(123, "login", "name", 98, "asd", LocalDate.now()));
 
 			ObservableList<User> obsUsers = FXCollections.observableArrayList(usersList);
 			ObservableList<Book> obsBook = FXCollections.observableArrayList(booksList);
@@ -133,7 +151,6 @@ public class LibraryViewer extends Scene
 			users.setItems(obsUsers);
 			books.setItems(obsBook);
 			loans.setItems(obsLoan);
-
 		}
 
 	}
