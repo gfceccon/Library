@@ -2,6 +2,7 @@ package br.usp.icmc.library;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.collections.transformation.FilteredList;
 import javafx.scene.Scene;
 import javafx.scene.control.Label;
 import javafx.scene.control.TabPane;
@@ -11,6 +12,7 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
+import javafx.scene.text.TextAlignment;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -24,26 +26,30 @@ public class LibraryViewer extends Scene
 	private TableView<Book> books;
 	private TableView<Loan> loans;
 
+	private TextField userSearch;
+	private TextField bookSearch;
+	private DatePicker loanSearch;
+
 	public LibraryViewer(Pane pane)
 	{
 		super(pane);
 		controller = LibraryController.getInstance();
-		users = new TableView<User>();
-		books = new TableView<Book>();
-		loans = new TableView<Loan>();
+		users = new TableView<>();
+		books = new TableView<>();
+		loans = new TableView<>();
 
-		TableColumn userId = new TableColumn("Login");
-		userId.setCellValueFactory(new PropertyValueFactory<User, String>("login"));
-		TableColumn name = new TableColumn("Name");
-		name.setCellValueFactory(new PropertyValueFactory<User, String>("name"));
-		TableColumn contact = new TableColumn("Contact");
-		contact.setCellValueFactory(new PropertyValueFactory<User, String>("contact"));
-		TableColumn email = new TableColumn("E-mail");
-		email.setCellValueFactory(new PropertyValueFactory<User, String>("email"));
+		TableColumn<User, String> userId = new TableColumn<>("Login");
+		userId.setCellValueFactory(new PropertyValueFactory<>("login"));
+		TableColumn<User, String> name = new TableColumn<>("Name");
+		name.setCellValueFactory(new PropertyValueFactory<>("name"));
+		TableColumn<User, String> contact = new TableColumn<>("Contact");
+		contact.setCellValueFactory(new PropertyValueFactory<>("contact"));
+		TableColumn<User, String> email = new TableColumn<>("E-mail");
+		email.setCellValueFactory(new PropertyValueFactory<>("email"));
 
 		users.getColumns().addAll(userId, name, contact, email);
 
-		TextField userSearch = new TextField();
+		userSearch = new TextField();
 		userSearch.setPromptText("Search user by name");
 		Button addUser = new Button("Add User");
 		Button removeUser = new Button("Remove User");
@@ -53,16 +59,16 @@ public class LibraryViewer extends Scene
 		usersTab.setClosable(false);
 
 
-		TableColumn bookId = new TableColumn("ID");
-		bookId.setCellValueFactory(new PropertyValueFactory<Book, Integer>("id"));
-		TableColumn title = new TableColumn("Title");
-		title.setCellValueFactory(new PropertyValueFactory<Book, String>("title"));
-		TableColumn availability = new TableColumn("Availability");
-		availability.setCellValueFactory(new PropertyValueFactory<Book, Boolean>("isAvailable"));
+		TableColumn<Book, Integer> bookId = new TableColumn<>("ID");
+		bookId.setCellValueFactory(new PropertyValueFactory<>("id"));
+		TableColumn<Book, String> title = new TableColumn<>("Title");
+		title.setCellValueFactory(new PropertyValueFactory<>("title"));
+		TableColumn<Book, Boolean> availability = new TableColumn<>("Availability");
+		availability.setCellValueFactory(new PropertyValueFactory<>("isAvailable"));
 
 		books.getColumns().addAll(bookId, title, availability);
 
-		TextField bookSearch = new TextField();
+		bookSearch = new TextField();
 		bookSearch.setPromptText("Search book by name");
 		Button addBook = new Button("Add Book");
 		Button removeBook = new Button("Remove Book");
@@ -72,21 +78,21 @@ public class LibraryViewer extends Scene
 		Tab booksTab = new Tab("Books", vBoxBooksTab);
 		booksTab.setClosable(false);
 
-		TableColumn loanId = new TableColumn("ID");
-		loanId.setCellValueFactory(new PropertyValueFactory<Loan, Integer>("id"));
-		TableColumn loanUserName = new TableColumn("User ID");
-		loanUserName.setCellValueFactory(new PropertyValueFactory<Loan, String>("userName"));
-		TableColumn loanBookTitle = new TableColumn("Book ID");
+		TableColumn<Loan, Integer> loanId = new TableColumn<>("ID");
+		loanId.setCellValueFactory(new PropertyValueFactory<>("id"));
+		TableColumn<Loan, String> loanUserName = new TableColumn<>("User ID");
+		loanUserName.setCellValueFactory(new PropertyValueFactory<>("userName"));
+		TableColumn<Loan, String> loanBookTitle = new TableColumn<>("Book ID");
 		loanBookTitle.setCellValueFactory(new PropertyValueFactory<Loan, String>("bookTitle"));
-		TableColumn loanDate = new TableColumn("Loan Date");
-		loanDate.setCellValueFactory(new PropertyValueFactory<Loan, LocalDate>("loanDate"));
-		TableColumn returnDate = new TableColumn("Return Date");
-		returnDate.setCellValueFactory(new PropertyValueFactory<Loan, LocalDate>("returnDate"));
+		TableColumn<Loan, String> loanDate = new TableColumn<>("Loan Date");
+		loanDate.setCellValueFactory(new PropertyValueFactory<>("loanDate"));
+		TableColumn<Loan, String> returnDate = new TableColumn<>("Return Date");
+		returnDate.setCellValueFactory(new PropertyValueFactory<>("returnDate"));
 
 		loans.getColumns().addAll(loanId, loanUserName, loanBookTitle, loanDate, returnDate);
 
 		Label loanSearchLabel = new Label("Search Loan Date: ");
-		DatePicker loanSearch = new DatePicker();
+		loanSearch = new DatePicker();
 		Button returnBook = new Button("Return Book");
 		HBox hBoxLoansTab = new HBox(loanSearchLabel, loanSearch);
 		VBox vBoxLoansTab = new VBox(hBoxLoansTab, loans, returnBook);
@@ -108,23 +114,23 @@ public class LibraryViewer extends Scene
 		Alert datePickerModal = new Alert(Alert.AlertType.CONFIRMATION);
 		datePickerModal.setTitle("Choose a date");
 		datePickerModal.getDialogPane().getChildren().add(datePicker);
-		menuSetDate.setOnAction(e -> {
+		menuSetDate.setOnAction(event -> {
 			datePickerModal.showAndWait();
-
-			//try
-			//{
-			//	controller.setDate(date);
-			//} catch (Exception e)
-			//{
-			//	System.out.println(e.getMessage());
-			//	System.out.println(e.getStackTrace());
-			//}
+			try
+			{
+				LocalDate date = datePicker.getValue();
+				controller.setDate(date);
+				currentDate.setText(date.format(DateTimeFormatter.ofPattern("dd/MM/yyyy")));
+			}
+			catch (Exception e)
+			{
+				System.out.println(e.getMessage());
+				e.printStackTrace();
+			}
 		});
 
 		menuFile.getItems().addAll(menuImportFile, menuExportFile);
 		menuOption.getItems().addAll(menuSetDate);
-
-		//date.format(DateTimeFormatter.ofPattern("dd/MM/yyyy"))
 
 
 		TabPane tabPane = new TabPane(usersTab, booksTab, loansTab);
@@ -138,19 +144,67 @@ public class LibraryViewer extends Scene
 		fillTable();
 	}
 
-		private void fillTable()
-		{
-			List<User> usersList = controller.getUsers();
-			List<Book> booksList = controller.getBooks();
-			List<Loan> loansList = controller.getLoans();
+	private void fillTable()
+	{
+		List<User> usersList = controller.getUsers();
+		List<Book> booksList = controller.getBooks();
+		List<Loan> loansList = controller.getLoans();
 
-			ObservableList<User> obsUsers = FXCollections.observableArrayList(usersList);
-			ObservableList<Book> obsBook = FXCollections.observableArrayList(booksList);
-			ObservableList<Loan> obsLoan = FXCollections.observableArrayList(loansList);
+		ObservableList<User> obsUser = FXCollections.observableArrayList(usersList);
+		ObservableList<Book> obsBook = FXCollections.observableArrayList(booksList);
+		ObservableList<Loan> obsLoan = FXCollections.observableArrayList(loansList);
 
-			users.setItems(obsUsers);
-			books.setItems(obsBook);
-			loans.setItems(obsLoan);
-		}
+		FilteredList<User> filteredUser = new FilteredList<>(obsUser, u -> true);
+		FilteredList<Book> filteredBook = new FilteredList<>(obsBook, b -> true);
+		FilteredList<Loan> filteredLoan = new FilteredList<>(obsLoan, l -> true);
 
+		userSearch.textProperty().addListener((observable, oldValue, newValue) -> {
+			filteredUser.setPredicate(user -> {
+				if (newValue == null || newValue.isEmpty())
+					return true;
+
+				String userFilter = newValue.toLowerCase();
+
+				if (user.getLogin().toLowerCase().contains(userFilter))
+					return true;
+				else if (user.getName().toLowerCase().contains(userFilter))
+					return true;
+				return false;
+			});
+		});
+
+		bookSearch.textProperty().addListener((observable, oldValue, newValue) -> {
+			filteredBook.setPredicate(book -> {
+				if (newValue == null || newValue.isEmpty())
+					return true;
+
+				String bookFilter = newValue.toLowerCase();
+
+				if (book.getTitle().toLowerCase().contains(bookFilter))
+					return true;
+				else if (Integer.toString(book.getId()).contains(bookFilter))
+					return true;
+				return false;
+			});
+		});
+		loanSearch.setOnAction(event -> {
+			filteredLoan.setPredicate(loan -> {
+				if (loanSearch.getValue() == null)
+					return true;
+
+				String loanFilter = loanSearch.getValue().format(DateTimeFormatter.ofPattern("dd/MM/yyyy"));
+
+				if (loan.getLoanDate().equals(loanFilter))
+					return true;
+				else if (loan.getReturnDate().equals(loanFilter))
+					return true;
+				return false;
+			});
+		});
+
+		users.setItems(filteredUser);
+		books.setItems(filteredBook);
+		loans.setItems(filteredLoan);
 	}
+
+}

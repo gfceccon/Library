@@ -1,6 +1,7 @@
 package br.usp.icmc.library;
 
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 
 public class Loan implements CSVSerializable
 {
@@ -51,20 +52,20 @@ public class Loan implements CSVSerializable
 		this.bookTitle = bookTitle;
 	}
 
-	public LocalDate getLoanDate() {
-		return loanDate;
+	public String getLoanDate() {
+			return loanDate.format(DateTimeFormatter.ofPattern("dd/MM/yyyy"));
 	}
 
-	public void setLoanDate(LocalDate loanDate) {
-		this.loanDate = loanDate;
+	public void setLoanDate(String loanDate) {
+		this.loanDate = LocalDate.parse(loanDate, DateTimeFormatter.ofPattern("dd/MM/yyyy"));
 	}
 
-	public LocalDate getReturnDate() {
-		return returnDate;
+	public String getReturnDate() {
+		return returnDate.format(DateTimeFormatter.ofPattern("dd/MM/yyyy"));
 	}
 
-	public void setReturnDate(LocalDate returnDate) {
-		this.returnDate = returnDate;
+	public void setReturnDate(String returnDate) {
+		this.returnDate = LocalDate.parse(returnDate, DateTimeFormatter.ofPattern("dd/MM/yyyy"));
 	}
 
 	public LocalDate returnDate;
