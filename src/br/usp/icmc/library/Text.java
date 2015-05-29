@@ -30,13 +30,18 @@ public class Text extends Book
 		ret[0] = "Text";
 		ret[1] = Integer.toString(this.id);
 		ret[2] = this.title;
+		ret[3] = this.author;
+		ret[4] = this.publisher;
+		ret[5] = Integer.toString(this.year);
+		ret[6] = Integer.toString(this.pages);
+
 		if(this.isAvailable)
 		{
-			ret[3] = "YES";
+			ret[7] = "YES";
 		}
 		else
 		{
-			ret[3] = "NO";
+			ret[7] = "NO";
 		}
 
 		return ret;
@@ -45,6 +50,6 @@ public class Text extends Book
 	@Override
 	public int getNumberOfArguments()
 	{
-		return 4;
+		return 8;
 	}
 }

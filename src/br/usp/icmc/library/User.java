@@ -9,10 +9,12 @@ public abstract class User implements CSVSerializable
 	public String name;
 	public String contact;
 	public String email;
+	public String address;
+	public String cpf;
 	public int maxBookCount;
 	public int maxLoanTime;
 
-	private LocalDate banDate;
+	public LocalDate banDate;
 
 	public String getLogin() {
 		return login;
@@ -46,6 +48,22 @@ public abstract class User implements CSVSerializable
 		this.email = email;
 	}
 
+	public String getAddress() {
+		return address;
+	}
+
+	public void setAddress(String address) {
+		this.address = address;
+	}
+
+	public String getCpf() {
+		return cpf;
+	}
+
+	public void setCpf(String cpf) {
+		this.cpf = cpf;
+	}
+
 	public int getMaxBookCount() {
 		return maxBookCount;
 	}
@@ -70,14 +88,18 @@ public abstract class User implements CSVSerializable
 		this.login = args[2];
 		this.contact = args[3];
 		this.email = args[4];
+		this.address = args[5];
+		this.cpf = args[6];
+		this.maxBookCount = Integer.parseInt(args[7]);
+		this.maxLoanTime = Integer.parseInt(args[8]);
 
-		if(args[5].equals(""))
+		if(args[9].equals(""))
 		{
 			this.setBanDate(null);
 		}
 		else
 		{
-			this.setBanDate(LocalDate.parse(args[5], DateTimeFormatter.ofPattern("dd'/'MM'/'yyyy")));
+			this.setBanDate(LocalDate.parse(args[9], DateTimeFormatter.ofPattern("dd'/'MM'/'yyyy")));
 		}
 	}
 

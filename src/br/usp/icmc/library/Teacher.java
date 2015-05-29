@@ -37,7 +37,20 @@ public class Teacher extends User
 		ret[1] = this.name;
 		ret[2] = this.login;
 		ret[3] = this.contact;
-		ret[4] = this.getBanDate().format(DateTimeFormatter.ofPattern("dd'/'MM'/'yyyy"));
+		ret[4] = this.email;
+		ret[5] = this.address;
+		ret[6] = this.cpf;
+		ret[7] = Integer.toString(this.maxBookCount);
+		ret[8] = Integer.toString(this.maxLoanTime);
+
+		if(this.banDate == null)
+		{
+			ret[9] = "";
+		}
+		else
+		{
+			ret[9] = banDate.format(DateTimeFormatter.ofPattern("dd'/'MM'/'yyyy"));
+		}
 
 		return ret;
 	}
@@ -45,6 +58,6 @@ public class Teacher extends User
 	@Override
 	public int getNumberOfArguments()
 	{
-		return 6;
+		return 10;
 	}
 }
