@@ -78,8 +78,10 @@ public abstract class User implements CSVSerializable {
         this.maxLoanTime = maxLoanTime;
     }
 
-    public LocalDate getBanDate() {
-        return this.banDate;
+    public String getBanDate() {
+        if(banDate != null)
+            return banDate.format(DateTimeFormatter.ofPattern("dd/MM/yyyy"));
+        return "-";
     }
 
     public void setBanDate(LocalDate newBanDate) {

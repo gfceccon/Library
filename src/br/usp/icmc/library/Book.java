@@ -58,8 +58,10 @@ public abstract class Book implements CSVSerializable
 		this.pages = pages;
 	}
 
-	public boolean getIsAvailable() {
-		return isAvailable;
+	public String getIsAvailable() {
+		if(isAvailable == true)
+			return "Yes";
+		return "No";
 	}
 
 	public void setIsAvailable(boolean isAvailable) {

@@ -4,6 +4,8 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
 import javafx.collections.transformation.SortedList;
+import javafx.geometry.HPos;
+import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Label;
 import javafx.scene.control.TabPane;
@@ -14,12 +16,10 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
-import javafx.scene.text.TextAlignment;
-import javafx.stage.Modality;
+import sun.swing.MenuItemLayoutHelper;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.List;
 import java.util.Optional;
 
 public class LibraryViewer extends Scene
@@ -42,6 +42,37 @@ public class LibraryViewer extends Scene
 		books = new TableView<>();
 		loans = new TableView<>();
 
+        MenuBar menuBar = new MenuBar();
+        Menu menuFile = new Menu("File");
+        Menu menuOption = new Menu("Options");
+
+        MenuItem menuExportFile = new MenuItem("Export...");
+        MenuItem menuImportFile = new MenuItem("Import...");
+        MenuItem menuSetDate = new MenuItem("Set Date");
+        Label currentDate = new Label();
+
+        menuFile.getItems().addAll(menuImportFile, menuExportFile);
+        menuOption.getItems().addAll(menuSetDate);
+        menuBar.getMenus().addAll(menuFile, menuOption);
+
+        Alert datePickerModal = new Alert(Alert.AlertType.CONFIRMATION);
+        DatePicker datePicker = new DatePicker();
+        datePickerModal.setTitle("Choose a Date");
+        datePickerModal.setHeaderText("Choose a date!");
+        datePickerModal.getDialogPane().setContent(datePicker);
+        menuSetDate.setOnAction(event -> {
+            ButtonType returnValue = datePickerModal.showAndWait().get();
+            if (returnValue == null || returnValue.equals(ButtonType.CANCEL))
+                return;
+            try {
+                LocalDate date = datePicker.getValue();
+                controller.setDate(date);
+                currentDate.setText(date.format(DateTimeFormatter.ofPattern("dd/MM/yyyy")));
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        });
+
 		userSearch = new TextField();
 		userSearch.setPromptText("Search user by name");
 		Button addUser = new Button("Add User");
@@ -61,52 +92,17 @@ public class LibraryViewer extends Scene
 		Tab booksTab = new Tab("Books", vBoxBooksTab);
 		booksTab.setClosable(false);
 
-		Label loanSearchLabel = new Label("Search Loan Date: ");
+		Label loanSearchLabel = new Label(" Search loan by date: ");
 		loanSearch = new DatePicker();
 		Button returnBook = new Button("Return Book");
 		HBox hBoxLoansTab = new HBox(loanSearchLabel, loanSearch);
+        hBoxLoansTab.setAlignment(Pos.CENTER_LEFT);
 		VBox vBoxLoansTab = new VBox(hBoxLoansTab, loans, returnBook);
 		Tab loansTab = new Tab("Loans", vBoxLoansTab);
 		loansTab.setClosable(false);
 
-		Label currentDate = new Label();
-		MenuBar menuBar = new MenuBar();
-		Menu menuFile = new Menu("File");
-		Menu menuOption = new Menu("Option");
-
-		MenuItem menuExportFile = new MenuItem("Export");
-		MenuItem menuImportFile = new MenuItem("Import");
-		MenuItem menuSetDate = new MenuItem("Set Date");
-
-		Alert datePickerModal = new Alert(Alert.AlertType.CONFIRMATION);
-		DatePicker datePicker = new DatePicker();
-		datePickerModal.setTitle("Choose a date");
-		datePickerModal.setContentText("Choose a date:");
-		datePickerModal.getDialogPane().setContent(datePicker);
-		menuSetDate.setOnAction(event -> {
-			ButtonType returnValue = datePickerModal.showAndWait().get();
-			if(returnValue == null || returnValue.equals(ButtonType.CANCEL))
-				return;
-			try
-			{
-				LocalDate date = datePicker.getValue();
-				controller.setDate(date);
-				currentDate.setText(date.format(DateTimeFormatter.ofPattern("dd/MM/yyyy")));
-			}
-			catch (Exception e)
-			{
-				e.printStackTrace();
-			}
-		});
-
-		menuFile.getItems().addAll(menuImportFile, menuExportFile);
-		menuOption.getItems().addAll(menuSetDate);
-		menuBar.getMenus().addAll(menuFile, menuOption);
-
-
 		TabPane tabPane = new TabPane(usersTab, booksTab, loansTab);
 		VBox verticalPane = new VBox(menuBar, tabPane, currentDate);
-
 
 		verticalPane.setPrefWidth(800);
 		verticalPane.setPrefHeight(600);
@@ -121,7 +117,6 @@ public class LibraryViewer extends Scene
 			System.exit(0);
 		try
 		{
-
 			LocalDate date = datePicker.getValue();
 			controller.setDate(date);
 			currentDate.setText(date.format(DateTimeFormatter.ofPattern("dd/MM/yyyy")));
@@ -144,15 +139,23 @@ public class LibraryViewer extends Scene
 		TextField addressField = new TextField();
 		TextField cpfField = new TextField();
 
-		Label usernameLabel 	= new Label("Username");
-		Label nameLabel 		= new Label("Name");
-		Label typeLabel 		= new Label("Type");
-		Label contactLabel 		= new Label("Contact");
-		Label emailLabel 		= new Label("Email");
-		Label addressLabel 		= new Label("Address");
-		Label cpfLabel			= new Label("CPF");
+		Label usernameLabel 	= new Label("Username: ");
+		Label nameLabel 		= new Label("Name: ");
+		Label typeLabel 		= new Label("Type: ");
+		Label contactLabel 		= new Label("Contact: ");
+		Label emailLabel 		= new Label("Email: ");
+		Label addressLabel 		= new Label("Address: ");
+		Label cpfLabel			= new Label("CPF: ");
 
-		GridPane pane = new GridPane();
+        GridPane.setHalignment(usernameLabel, HPos.RIGHT);
+        GridPane.setHalignment(nameLabel, HPos.RIGHT);
+        GridPane.setHalignment(typeLabel, HPos.RIGHT);
+        GridPane.setHalignment(contactLabel, HPos.RIGHT);
+        GridPane.setHalignment(emailLabel, HPos.RIGHT);
+        GridPane.setHalignment(addressLabel, HPos.RIGHT);
+        GridPane.setHalignment(cpfLabel, HPos.RIGHT);
+
+        GridPane pane = new GridPane();
 
 		pane.addColumn(0,
 				usernameLabel,
@@ -164,16 +167,16 @@ public class LibraryViewer extends Scene
 				cpfLabel);
 
 		pane.addColumn(1,
-				usernameField,
-				nameField,
-				typeComboBox,
-				contactField,
-				emailField,
-				addressField,
-				cpfField);
+                usernameField,
+                nameField,
+                typeComboBox,
+                contactField,
+                emailField,
+                addressField,
+                cpfField);
 
-		dialog.setTitle("Add user");
-		dialog.setContentText("User information");
+		dialog.setTitle("Add User");
+        dialog.setHeaderText("Insert user information!");
 		dialog.getDialogPane().setContent(pane);
 
 		button.setOnAction(event -> {
@@ -235,17 +238,21 @@ public class LibraryViewer extends Scene
 	private void addUserColumns()
 	{
 		TableColumn<User, String> userId = new TableColumn<>("Login");
-        //userId.setCellValueFactory(cellData -> cellData.getValue().login);
-
 		userId.setCellValueFactory(new PropertyValueFactory<>("login"));
 		TableColumn<User, String> name = new TableColumn<>("Name");
 		name.setCellValueFactory(new PropertyValueFactory<>("name"));
+        TableColumn<User, String> cpf = new TableColumn<>("CPF");
+        cpf.setCellValueFactory(new PropertyValueFactory<>("cpf"));
+        TableColumn<User, String> address = new TableColumn<>("Address");
+        address.setCellValueFactory(new PropertyValueFactory<>("address"));
 		TableColumn<User, String> contact = new TableColumn<>("Contact");
 		contact.setCellValueFactory(new PropertyValueFactory<>("contact"));
 		TableColumn<User, String> email = new TableColumn<>("E-mail");
 		email.setCellValueFactory(new PropertyValueFactory<>("email"));
+        TableColumn<User, String> banned = new TableColumn<>("Banned Until");
+        banned.setCellValueFactory(new PropertyValueFactory<>("banDate"));
 
-		users.getColumns().addAll(userId, name, contact, email);
+		users.getColumns().addAll(userId, name, cpf, address, contact, email, banned);
 	}
 
 	private void addBookColumns()
@@ -254,10 +261,18 @@ public class LibraryViewer extends Scene
 		bookId.setCellValueFactory(new PropertyValueFactory<>("id"));
 		TableColumn<Book, String> title = new TableColumn<>("Title");
 		title.setCellValueFactory(new PropertyValueFactory<>("title"));
-		TableColumn<Book, Boolean> availability = new TableColumn<>("Availability");
+        TableColumn<Book, String> author = new TableColumn<>("Author");
+        author.setCellValueFactory(new PropertyValueFactory<>("author"));
+        TableColumn<Book, String> publisher = new TableColumn<>("Publisher");
+        publisher.setCellValueFactory(new PropertyValueFactory<>("publisher"));
+        TableColumn<Book, Integer> year = new TableColumn<>("Year");
+        year.setCellValueFactory(new PropertyValueFactory<>("year"));
+        TableColumn<Book, Integer> pages = new TableColumn<>("# of Pages");
+        pages.setCellValueFactory(new PropertyValueFactory<>("pages"));
+		TableColumn<Book, String> availability = new TableColumn<>("Available?");
 		availability.setCellValueFactory(new PropertyValueFactory<>("isAvailable"));
 
-		books.getColumns().addAll(bookId, title, availability);
+		books.getColumns().addAll(bookId, title, author, publisher, year, pages, availability);
 	}
 
 	private void addLoanColumns()

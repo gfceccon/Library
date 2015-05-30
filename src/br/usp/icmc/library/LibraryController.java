@@ -5,7 +5,6 @@ import javafx.collections.ObservableList;
 
 import java.time.LocalDate;
 import java.time.Period;
-import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -45,7 +44,7 @@ public class LibraryController {
                     throw new Exception("This book was already lent!");
 
                 if (user.get().getBanDate() != null) // If the user is banned
-                    throw new Exception("This user is banned until " + user.get().getBanDate().format(DateTimeFormatter.ofPattern("dd'/'MM'/'yyyy")) + "!");
+                    throw new Exception("This user is banned until " + user.get().getBanDate() + "!");
 
                 if (book.get() instanceof Text && user.get() instanceof Community) // If a community user tries to borrow a text book
                     throw new Exception("Community user can't borrow text books!");

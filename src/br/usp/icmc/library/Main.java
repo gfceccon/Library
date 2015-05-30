@@ -1,12 +1,8 @@
 package br.usp.icmc.library;
 
 import javafx.application.Application;
-import javafx.scene.Scene;
-import javafx.scene.control.DatePicker;
 import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
-
-import java.time.LocalDate;
 
 public class Main extends Application
 {
@@ -14,7 +10,10 @@ public class Main extends Application
 	public void start(Stage primaryStage) throws Exception
 	{
 		primaryStage.setScene(new LibraryViewer(new Pane()));
-		primaryStage.show();
+		primaryStage.setTitle("Library Manager System");
+		primaryStage.setWidth(800);
+		primaryStage.setMaxHeight(550);
+		primaryStage.setResizable(false);
 		primaryStage.show();
 	}
 
