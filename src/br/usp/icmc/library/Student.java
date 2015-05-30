@@ -1,7 +1,5 @@
 package br.usp.icmc.library;
 
-import java.time.format.DateTimeFormatter;
-
 public class Student extends User {
     public Student() {
         maxBookCount = 4;

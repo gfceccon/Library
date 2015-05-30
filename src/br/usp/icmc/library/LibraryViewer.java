@@ -1,6 +1,5 @@
 package br.usp.icmc.library;
 
-import com.sun.glass.ui.CommonDialogs;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
@@ -161,10 +160,10 @@ public class LibraryViewer extends Scene
 	{
 		Stage fileChooserStage = new Stage();
 		FileChooser fileChooser = new FileChooser();
-		fileChooser.setTitle("Open Import File");
+		fileChooser.setTitle("Choose " + type + " Data File");
 		fileChooser.getExtensionFilters().addAll(
-				new ExtensionFilter("CSV Files", "*.csv"),
-				new ExtensionFilter("All Files", "*.*"));
+                new ExtensionFilter("CSV Files", "*.csv"),
+                new ExtensionFilter("All Files", "*.*"));
 
 		menu.setOnAction(event -> {
 			File selectedFile = fileChooser.showOpenDialog(fileChooserStage);
@@ -191,7 +190,7 @@ public class LibraryViewer extends Scene
 	{
 		Stage fileChooserStage = new Stage();
 		FileChooser fileChooser = new FileChooser();
-		fileChooser.setTitle("Choose Export File");
+        fileChooser.setTitle("Choose " + type + " Data File");
 		fileChooser.getExtensionFilters().addAll(
 				new ExtensionFilter("CSV Files", "*.csv"),
 				new ExtensionFilter("All Files", "*.*"));

@@ -1,7 +1,5 @@
 package br.usp.icmc.library;
 
-import java.time.format.DateTimeFormatter;
-
 public class Community extends User {
     public Community() {
         maxBookCount = 2;

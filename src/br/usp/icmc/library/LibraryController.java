@@ -1,6 +1,5 @@
 package br.usp.icmc.library;
 
-import com.sun.javaws.exceptions.InvalidArgumentException;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
