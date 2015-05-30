@@ -86,15 +86,43 @@ public class Loan implements CSVSerializable {
     public void parse(String[] args) throws Exception {
         if (args.length != getNumberOfArguments())
             throw new IllegalArgumentException("Wrong number of arguments!");
+
+        this.id = Integer.parseInt(args[0]);
+        this.userLogin = args[1];
+        this.userName = args[2];
+        this.bookId = Integer.parseInt(args[3]);
+        this.bookTitle = args[4];
+        this.loanDate = LocalDate.parse(args[5], DateTimeFormatter.ofPattern("dd'/'MM'/'yyyy"));
+        if (args[6].equals("-")) {
+            this.returnDate = null;
+        } else {
+            this.returnDate = LocalDate.parse(args[6], DateTimeFormatter.ofPattern("dd'/'MM'/'yyyy"));
+        }
+
     }
 
     @Override
     public String[] toCSV() throws Exception {
-        return null;
+        String[] ret = new String[getNumberOfArguments()];
+
+        ret[0] = Integer.toString(this.id);
+        ret[1] = this.userLogin;
+        ret[2] = this.userName;
+        ret[3] = Integer.toString(this.bookId);
+        ret[4] = this.bookTitle;
+        ret[5] = this.loanDate.format(DateTimeFormatter.ofPattern("dd'/'MM'/'yyyy"));
+
+        if (this.returnDate == null) {
+            ret[6] = "-";
+        } else {
+            ret[6] = this.loanDate.format(DateTimeFormatter.ofPattern("dd'/'MM'/'yyyy"));
+        }
+
+        return ret;
     }
 
     @Override
     public int getNumberOfArguments() {
-        return 5;
+        return 7;
     }
 }
