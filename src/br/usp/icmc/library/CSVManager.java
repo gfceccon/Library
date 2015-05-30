@@ -1,15 +1,15 @@
 package br.usp.icmc.library;
 
-import jdk.internal.org.objectweb.asm.util.Printer;
-
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import java.io.*;
-import java.util.*;
 
 public class CSVManager
 {
-    public List<User> parseUserFile(String userFile)
+    public ObservableList<User> parseUserFile(File userFile)
     {
-        List<User> l = new ArrayList<User>();
+        ObservableList<User> l = FXCollections.observableArrayList();
+
         BufferedReader reader;
         String csvline;
 
@@ -21,7 +21,7 @@ public class CSVManager
                 l.add(this.parseUser(csvline));
             }
         }
-        catch (java.io.IOException e)
+        catch (IOException e)
         {
             e.printStackTrace();
         }
@@ -29,9 +29,9 @@ public class CSVManager
         return l;
     }
 
-    public List<Book> parseBookFile(String bookFile)
+    public ObservableList<Book> parseBookFile(File bookFile)
     {
-        List<Book> l = new ArrayList<Book>();
+        ObservableList<Book> l = FXCollections.observableArrayList();
         BufferedReader reader;
         String csvline;
 
@@ -43,7 +43,7 @@ public class CSVManager
                 l.add(this.parseBook(csvline));
             }
         }
-        catch (java.io.IOException e)
+        catch (IOException e)
         {
             e.printStackTrace();
         }
@@ -51,9 +51,9 @@ public class CSVManager
         return l;
     }
 
-    public List<Loan> parseLoanFile(String loanFile)
+    public ObservableList<Loan> parseLoanFile(File loanFile)
     {
-        List<Loan> l = new ArrayList<Loan>();
+        ObservableList<Loan> l = FXCollections.observableArrayList();
         BufferedReader reader;
         String csvline;
 
@@ -65,7 +65,7 @@ public class CSVManager
                 l.add(this.parseLoan(csvline));
             }
         }
-        catch (java.io.IOException e)
+        catch (IOException e)
         {
             e.printStackTrace();
         }
@@ -73,7 +73,7 @@ public class CSVManager
         return l;
     }
 
-    public void writeFile(String fp, List<CSVSerializable> l)
+    public void writeFile(File fp, ObservableList<? extends CSVSerializable> l)
     {
         try
         {
@@ -91,6 +91,8 @@ public class CSVManager
                     e.printStackTrace();
                 }
             }
+
+            writer.close();
         }
         catch (IOException e)
         {

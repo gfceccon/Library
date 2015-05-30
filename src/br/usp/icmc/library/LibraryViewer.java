@@ -1,5 +1,6 @@
 package br.usp.icmc.library;
 
+import com.sun.glass.ui.CommonDialogs;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
@@ -16,7 +17,11 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
+import javafx.stage.FileChooser;
+import javafx.stage.FileChooser.ExtensionFilter;
+import javafx.stage.Stage;
 
+import java.io.File;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.Optional;
@@ -24,6 +29,7 @@ import java.util.Optional;
 public class LibraryViewer extends Scene
 {
 	private LibraryController controller;
+	private CSVManager manager;
 
 	private TableView<User> users;
 	private TableView<Book> books;
@@ -37,6 +43,8 @@ public class LibraryViewer extends Scene
 	{
 		super(pane);
 		controller = LibraryController.getInstance();
+		manager = new CSVManager();
+
 		users = new TableView<>();
 		books = new TableView<>();
 		loans = new TableView<>();
@@ -44,13 +52,22 @@ public class LibraryViewer extends Scene
         MenuBar menuBar = new MenuBar();
         Menu menuFile = new Menu("File");
         Menu menuOption = new Menu("Options");
+		Menu menuImport = new Menu("Import");
+		Menu menuExport = new Menu("Export");
 
-        MenuItem menuExportFile = new MenuItem("Export...");
-        MenuItem menuImportFile = new MenuItem("Import...");
-        MenuItem menuSetDate = new MenuItem("Set Date");
+		MenuItem menuImportUsers = new MenuItem("Users");
+		MenuItem menuImportBooks = new MenuItem("Books");
+		MenuItem menuImportLoans = new MenuItem("Loans");
+		MenuItem menuExportUsers = new MenuItem("Users");
+		MenuItem menuExportBooks = new MenuItem("Books");
+		MenuItem menuExportLoans = new MenuItem("Loans");
+
+        MenuItem menuSetDate = new MenuItem("Set Date...");
         Label currentDate = new Label();
 
-        menuFile.getItems().addAll(menuImportFile, menuExportFile);
+        menuFile.getItems().addAll(menuImport, menuExport);
+		menuImport.getItems().addAll(menuImportUsers, menuImportBooks, menuImportLoans);
+		menuExport.getItems().addAll(menuExportUsers, menuExportBooks, menuExportLoans);
         menuOption.getItems().addAll(menuSetDate);
         menuBar.getMenus().addAll(menuFile, menuOption);
 
@@ -74,7 +91,7 @@ public class LibraryViewer extends Scene
         });
 
 		userSearch = new TextField();
-		userSearch.setPromptText("Search user by name");
+		userSearch.setPromptText("Search user by login or name");
 		Button addUser = new Button("Add User");
 		Button removeUser = new Button("Remove User");
 		HBox hBoxUsersTab = new HBox(addUser, removeUser);
@@ -116,6 +133,14 @@ public class LibraryViewer extends Scene
 		setRemoveBookButton(removeBook);
 		setLendButton(lendBook);
 
+		setImportMenu(menuImportUsers, "Users");
+		setImportMenu(menuImportBooks, "Books");
+		setImportMenu(menuImportLoans, "Loans");
+
+		setExportMenu(menuExportUsers, "Users");
+		setExportMenu(menuExportBooks, "Books");
+		setExportMenu(menuExportLoans, "Loans");
+
 		ButtonType returnValue = datePickerModal.showAndWait().get();
 		if(returnValue == null || returnValue.equals(ButtonType.CANCEL))
 			System.exit(0);
@@ -130,6 +155,65 @@ public class LibraryViewer extends Scene
 			e.printStackTrace();
 			System.exit(0);
 		}
+	}
+
+	private void setImportMenu(MenuItem menu, String type)
+	{
+		Stage fileChooserStage = new Stage();
+		FileChooser fileChooser = new FileChooser();
+		fileChooser.setTitle("Open Import File");
+		fileChooser.getExtensionFilters().addAll(
+				new ExtensionFilter("CSV Files", "*.csv"),
+				new ExtensionFilter("All Files", "*.*"));
+
+		menu.setOnAction(event -> {
+			File selectedFile = fileChooser.showOpenDialog(fileChooserStage);
+			if(selectedFile != null){
+				switch(type){
+					case "Users":
+						controller.setUsers(manager.parseUserFile(selectedFile));
+						break;
+
+					case "Books":
+						controller.setBooks(manager.parseBookFile(selectedFile));
+						break;
+
+					case "Loans":
+						controller.setLoans(manager.parseLoanFile(selectedFile));
+						break;
+				}
+				fillTable();
+			}
+		});
+	}
+
+	private void setExportMenu(MenuItem menu, String type)
+	{
+		Stage fileChooserStage = new Stage();
+		FileChooser fileChooser = new FileChooser();
+		fileChooser.setTitle("Choose Export File");
+		fileChooser.getExtensionFilters().addAll(
+				new ExtensionFilter("CSV Files", "*.csv"),
+				new ExtensionFilter("All Files", "*.*"));
+
+		menu.setOnAction(event -> {
+			File selectedFile = fileChooser.showSaveDialog(fileChooserStage);
+			if(selectedFile != null){
+				switch(type){
+					case "Users":
+						manager.writeFile(selectedFile, controller.getUsers());
+						break;
+
+					case "Books":
+						manager.writeFile(selectedFile, controller.getBooks());
+						break;
+
+					case "Loans":
+						manager.writeFile(selectedFile, controller.getLoans());
+						break;
+				}
+			}
+		});
 	}
 
 	private void setAddUserButton(Button button)
@@ -251,12 +335,19 @@ public class LibraryViewer extends Scene
 		TextField pagesField 			= new TextField();
 		typeComboBox.setValue("Text");
 
-		Label titleLabel 		= new Label("Title");
-		Label typeLabel 		= new Label("Type");
-		Label authorLabel 		= new Label("Author");
-		Label publisherLabel 	= new Label("Publisher");
-		Label yearLabel 		= new Label("Year");
-		Label pagesLabel		= new Label("Pages");
+		Label titleLabel 		= new Label("Title: ");
+		Label typeLabel 		= new Label("Type: ");
+		Label authorLabel 		= new Label("Author: ");
+		Label publisherLabel 	= new Label("Publisher: ");
+		Label yearLabel 		= new Label("Year: ");
+		Label pagesLabel		= new Label("Pages: ");
+
+		GridPane.setHalignment(titleLabel, HPos.RIGHT);
+		GridPane.setHalignment(typeLabel, HPos.RIGHT);
+		GridPane.setHalignment(authorLabel, HPos.RIGHT);
+		GridPane.setHalignment(publisherLabel, HPos.RIGHT);
+		GridPane.setHalignment(yearLabel, HPos.RIGHT);
+		GridPane.setHalignment(pagesLabel, HPos.RIGHT);
 
 		GridPane pane = new GridPane();
 
@@ -276,8 +367,8 @@ public class LibraryViewer extends Scene
 				yearField,
 				pagesField);
 
-		dialog.setTitle("Add book");
-		dialog.setHeaderText("Book information");
+		dialog.setTitle("Add Book");
+		dialog.setHeaderText("Insert book information!");
 		dialog.getDialogPane().setContent(pane);
 
 		button.setOnAction(event -> {
@@ -308,7 +399,7 @@ public class LibraryViewer extends Scene
 	private void setRemoveBookButton(Button button)
 	{
 		Alert confirmation = new Alert(Alert.AlertType.CONFIRMATION);
-		confirmation.setTitle("Remove book");
+		confirmation.setTitle("Remove Book");
 		confirmation.setHeaderText("Are you sure?");
 		button.setOnAction(event -> {
 			Optional<ButtonType> returnValue = confirmation.showAndWait();
@@ -424,8 +515,7 @@ public class LibraryViewer extends Scene
 		loans.selectionModelProperty().get().setSelectionMode(SelectionMode.SINGLE);
 	}
 
-	private void fillTable()
-	{
+	private void fillTable() {
 		ObservableList<User> obsUser = controller.getUsers();
 		ObservableList<Book> obsBook = controller.getBooks();
 		ObservableList<Loan> obsLoan = controller.getLoans();

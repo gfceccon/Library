@@ -211,12 +211,24 @@ public class LibraryController {
         return books;
     }
 
+    public void setUsers(ObservableList<User> users) {
+        this.users = users;
+    }
+
     public ObservableList<Loan> getLoans() {
         return loans;
     }
 
+    public void setBooks(ObservableList<Book> books) {
+        this.books = books;
+    }
+
     public ObservableList<User> getUsers() {
         return users;
+    }
+
+    public void setLoans(ObservableList<Loan> loans) {
+        this.loans = loans;
     }
 
     public void removeUser(User u) throws Exception

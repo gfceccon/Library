@@ -91,8 +91,8 @@ public abstract class User implements CSVSerializable {
 
     @Override
     public void parse(String[] args) throws Exception {
-        this.name = args[1];
-        this.login = args[2];
+        this.login = args[1];
+        this.name = args[2];
         this.contact = args[3];
         this.email = args[4];
         this.address = args[5];
@@ -100,10 +100,29 @@ public abstract class User implements CSVSerializable {
         this.maxBookCount = Integer.parseInt(args[7]);
         this.maxLoanTime = Integer.parseInt(args[8]);
 
-        if (args[9].equals("")) {
+        if (args[9].equals("-")) {
             this.setBanDate(null);
         } else {
             this.setBanDate(LocalDate.parse(args[9], DateTimeFormatter.ofPattern("dd'/'MM'/'yyyy")));
         }
+    }
+
+    public String[] toCSV(String[] ret) throws Exception {
+        ret[1] = this.login;
+        ret[2] = this.name;
+        ret[3] = this.contact;
+        ret[4] = this.email;
+        ret[5] = this.address;
+        ret[6] = this.cpf;
+        ret[7] = Integer.toString(this.maxBookCount);
+        ret[8] = Integer.toString(this.maxLoanTime);
+
+        if (this.banDate == null) {
+            ret[9] = "-";
+        } else {
+            ret[9] = banDate.format(DateTimeFormatter.ofPattern("dd'/'MM'/'yyyy"));
+        }
+
+        return ret;
     }
 }
