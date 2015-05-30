@@ -3,6 +3,7 @@ package br.usp.icmc.library;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
+import javafx.collections.transformation.SortedList;
 import javafx.scene.Scene;
 import javafx.scene.control.Label;
 import javafx.scene.control.TabPane;
@@ -65,7 +66,6 @@ public class LibraryViewer extends Scene
 		VBox vBoxLoansTab = new VBox(hBoxLoansTab, loans, returnBook);
 		Tab loansTab = new Tab("Loans", vBoxLoansTab);
 		loansTab.setClosable(false);
-
 
 		Label currentDate = new Label();
 		MenuBar menuBar = new MenuBar();
@@ -149,6 +149,8 @@ public class LibraryViewer extends Scene
 	private void addUserColumns()
 	{
 		TableColumn<User, String> userId = new TableColumn<>("Login");
+        //userId.setCellValueFactory(cellData -> cellData.getValue().login);
+
 		userId.setCellValueFactory(new PropertyValueFactory<>("login"));
 		TableColumn<User, String> name = new TableColumn<>("Name");
 		name.setCellValueFactory(new PropertyValueFactory<>("name"));
@@ -179,7 +181,7 @@ public class LibraryViewer extends Scene
 		TableColumn<Loan, String> loanUserName = new TableColumn<>("User ID");
 		loanUserName.setCellValueFactory(new PropertyValueFactory<>("userName"));
 		TableColumn<Loan, String> loanBookTitle = new TableColumn<>("Book ID");
-		loanBookTitle.setCellValueFactory(new PropertyValueFactory<Loan, String>("bookTitle"));
+		loanBookTitle.setCellValueFactory(new PropertyValueFactory<>("bookTitle"));
 		TableColumn<Loan, String> loanDate = new TableColumn<>("Loan Date");
 		loanDate.setCellValueFactory(new PropertyValueFactory<>("loanDate"));
 		TableColumn<Loan, String> returnDate = new TableColumn<>("Return Date");
@@ -190,65 +192,69 @@ public class LibraryViewer extends Scene
 
 	private void fillTable()
 	{
-		List<User> usersList = controller.getUsers();
-		List<Book> booksList = controller.getBooks();
-		List<Loan> loansList = controller.getLoans();
+		ObservableList<User> obsUser = controller.getUsers();
+		ObservableList<Book> obsBook = controller.getBooks();
+		ObservableList<Loan> obsLoan = controller.getLoans();
 
-		ObservableList<User> obsUser = FXCollections.observableArrayList(usersList);
-		ObservableList<Book> obsBook = FXCollections.observableArrayList(booksList);
-		ObservableList<Loan> obsLoan = FXCollections.observableArrayList(loansList);
-
-		FilteredList<User> filteredUser = new FilteredList<>(obsUser, u -> true);
+        FilteredList<User> filteredUser = new FilteredList<>(obsUser, u -> true);
 		FilteredList<Book> filteredBook = new FilteredList<>(obsBook, b -> true);
 		FilteredList<Loan> filteredLoan = new FilteredList<>(obsLoan, l -> true);
 
+        SortedList<User> sortedUser = new SortedList<>(filteredUser);
+        SortedList<Book> sortedBook = new SortedList<>(filteredBook);
+        SortedList<Loan> sortedLoan = new SortedList<>(filteredLoan);
+
+        sortedBook.comparatorProperty().bind(books.comparatorProperty());
+        sortedUser.comparatorProperty().bind(users.comparatorProperty());
+        sortedLoan.comparatorProperty().bind(loans.comparatorProperty());
+
 		userSearch.textProperty().addListener((observable, oldValue, newValue) -> {
-			filteredUser.setPredicate(user -> {
-				if (newValue == null || newValue.isEmpty())
-					return true;
+            filteredUser.setPredicate(user -> {
+                if (newValue == null || newValue.isEmpty())
+                    return true;
 
-				String userFilter = newValue.toLowerCase();
+                String userFilter = newValue.toLowerCase();
 
-				if (user.getLogin().toLowerCase().contains(userFilter))
-					return true;
-				else if (user.getName().toLowerCase().contains(userFilter))
-					return true;
-				return false;
-			});
-		});
+                if (user.getLogin().toLowerCase().contains(userFilter))
+                    return true;
+                else if (user.getName().toLowerCase().contains(userFilter))
+                    return true;
+                return false;
+            });
+        });
 
 		bookSearch.textProperty().addListener((observable, oldValue, newValue) -> {
-			filteredBook.setPredicate(book -> {
-				if (newValue == null || newValue.isEmpty())
-					return true;
+            filteredBook.setPredicate(book -> {
+                if (newValue == null || newValue.isEmpty())
+                    return true;
 
-				String bookFilter = newValue.toLowerCase();
+                String bookFilter = newValue.toLowerCase();
 
-				if (book.getTitle().toLowerCase().contains(bookFilter))
-					return true;
-				else if (Integer.toString(book.getId()).contains(bookFilter))
-					return true;
-				return false;
-			});
-		});
+                if (book.getTitle().toLowerCase().contains(bookFilter))
+                    return true;
+                else if (Integer.toString(book.getId()).contains(bookFilter))
+                    return true;
+                return false;
+            });
+        });
+
 		loanSearch.setOnAction(event -> {
-			filteredLoan.setPredicate(loan -> {
-				if (loanSearch.getValue() == null)
-					return true;
+            filteredLoan.setPredicate(loan -> {
+                if (loanSearch.getValue() == null)
+                    return true;
 
-				String loanFilter = loanSearch.getValue().format(DateTimeFormatter.ofPattern("dd/MM/yyyy"));
+                String loanFilter = loanSearch.getValue().format(DateTimeFormatter.ofPattern("dd/MM/yyyy"));
 
-				if (loan.getLoanDate().equals(loanFilter))
-					return true;
-				else if (loan.getReturnDate().equals(loanFilter))
-					return true;
-				return false;
-			});
-		});
+                if (loan.getLoanDate().equals(loanFilter))
+                    return true;
+                else if (loan.getReturnDate().equals(loanFilter))
+                    return true;
+                return false;
+            });
+        });
 
-		users.setItems(filteredUser);
-		books.setItems(filteredBook);
-		loans.setItems(filteredLoan);
-	}
-
+        users.setItems(sortedUser);
+		books.setItems(sortedBook);
+		loans.setItems(sortedLoan);
+    }
 }

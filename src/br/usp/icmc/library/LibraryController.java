@@ -1,9 +1,11 @@
 package br.usp.icmc.library;
 
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
+
 import java.time.LocalDate;
 import java.time.Period;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -11,14 +13,14 @@ import java.util.stream.Collectors;
 public class LibraryController {
     private static LibraryController instance;
     private LocalDate currentDate;
-    private List<User> users;
-    private List<Book> books;
-    private List<Loan> loans;
+    private ObservableList<User> users;
+    private ObservableList<Book> books;
+    private ObservableList<Loan> loans;
 
     private LibraryController() {
-        users = new ArrayList<>();
-        books = new ArrayList<>();
-        loans = new ArrayList<>();
+        users = FXCollections.observableArrayList();
+        books = FXCollections.observableArrayList();
+        loans = FXCollections.observableArrayList();
     }
 
     public static LibraryController getInstance() {
@@ -225,15 +227,15 @@ public class LibraryController {
                 .findFirst();
     }
 
-    public List<Book> getBooks() {
+    public ObservableList<Book> getBooks() {
         return books;
     }
 
-    public List<Loan> getLoans() {
+    public ObservableList<Loan> getLoans() {
         return loans;
     }
 
-    public List<User> getUsers() {
+    public ObservableList<User> getUsers() {
         return users;
     }
 }
