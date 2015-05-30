@@ -1,5 +1,6 @@
 package br.usp.icmc.library;
 
+import com.sun.javaws.exceptions.InvalidArgumentException;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
@@ -43,7 +44,7 @@ public class LibraryController {
                 if (!book.get().isAvailable)     // If the book is already lent
                     throw new Exception("This book was already lent!");
 
-                if (user.get().getBanDate() != null) // If the user is banned
+                if (user.get().banDate != null) // If the user is banned
                     throw new Exception("This user is banned until " + user.get().getBanDate() + "!");
 
                 if (book.get() instanceof Text && user.get() instanceof Community) // If a community user tries to borrow a text book
@@ -57,7 +58,7 @@ public class LibraryController {
                     throw new Exception("User can't borrow more books!");
 
                 user.get().maxBookCount++;
-                book.get().isAvailable = false;
+                book.get().setIsAvailable(false);
 
                 // Creates a new loan object with the given info
                 Loan newLoan = new Loan(loans.size(), user.get().login, user.get().name, book.get().id, book.get().title, currentDate);
@@ -167,26 +168,6 @@ public class LibraryController {
         return newGeneral;
     }
 
-    public void removeStudent(String login) {
-        // TODO, also need to treat the according exceptions in functions loanBook() and returnBook()
-    }
-
-    public void removeTeacher(String login) {
-        // TODO, also need to treat the according exceptions in functions loanBook() and returnBook()
-    }
-
-    public void removeCommunity(String login) {
-        // TODO, also need to treat the according exceptions in functions loanBook() and returnBook()
-    }
-
-    public void removeText(String id) {
-        // TODO, also need to treat the according exceptions in functions loanBook() and returnBook()
-    }
-
-    public void removeGeneral(String id) {
-        // TODO, also need to treat the according exceptions in functions loanBook() and returnBook()
-    }
-
     public List<User> searchUserByName(String name) {
         List<User> result = users
                 .stream()
@@ -236,5 +217,27 @@ public class LibraryController {
 
     public ObservableList<User> getUsers() {
         return users;
+    }
+
+    public void removeUser(User u) throws Exception
+    {
+        if(u == null)
+            throw new IllegalArgumentException();
+        if(loans.stream().anyMatch(loan -> {
+            if(loan.returnDate == null && loan.userLogin.equals(u.login))
+                return true;
+            return false;
+        }))
+            throw new Exception("User needs to return the book before being deleted");
+        users.remove(u);
+    }
+
+    public void removeBook(Book b) throws Exception
+    {
+        if(b == null)
+            throw new IllegalArgumentException();
+        if(!b.isAvailable)
+            throw new Exception("Book needs to be returned before being deleted");
+        books.remove(b);
     }
 }

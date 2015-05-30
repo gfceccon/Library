@@ -73,6 +73,8 @@ public class Loan implements CSVSerializable {
     }
 
     public String getReturnDate() {
+        if(returnDate == null)
+            return "";
         return returnDate.format(DateTimeFormatter.ofPattern("dd/MM/yyyy"));
     }
 

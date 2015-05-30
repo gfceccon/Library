@@ -16,7 +16,6 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
-import sun.swing.MenuItemLayoutHelper;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -64,7 +63,8 @@ public class LibraryViewer extends Scene
             ButtonType returnValue = datePickerModal.showAndWait().get();
             if (returnValue == null || returnValue.equals(ButtonType.CANCEL))
                 return;
-            try {
+            try
+			{
                 LocalDate date = datePicker.getValue();
                 controller.setDate(date);
                 currentDate.setText(date.format(DateTimeFormatter.ofPattern("dd/MM/yyyy")));
@@ -111,6 +111,10 @@ public class LibraryViewer extends Scene
 		addColumns();
 		fillTable();
 		setAddUserButton(addUser);
+		setRemoveUserButton(removeUser);
+		setAddBookButton(addBook);
+		setRemoveBookButton(removeBook);
+		setLendButton(lendBook);
 
 		ButtonType returnValue = datePickerModal.showAndWait().get();
 		if(returnValue == null || returnValue.equals(ButtonType.CANCEL))
@@ -131,13 +135,14 @@ public class LibraryViewer extends Scene
 	private void setAddUserButton(Button button)
 	{
 		Alert dialog = new Alert(Alert.AlertType.CONFIRMATION);
-		TextField usernameField = new TextField();
-		TextField nameField = new TextField();
-		ComboBox<String> typeComboBox = new ComboBox<>(FXCollections.observableArrayList("Student", "Teacher", "Community"));
-		TextField contactField = new TextField();
-		TextField emailField = new TextField();
-		TextField addressField = new TextField();
-		TextField cpfField = new TextField();
+		TextField usernameField 		= new TextField();
+		TextField nameField 			= new TextField();
+		ComboBox<String> typeComboBox 	= new ComboBox<>(FXCollections.observableArrayList("Student", "Teacher", "Community"));
+		TextField contactField 			= new TextField();
+		TextField emailField 			= new TextField();
+		TextField addressField 			= new TextField();
+		TextField cpfField 				= new TextField();
+		typeComboBox.setValue("Student");
 
 		Label usernameLabel 	= new Label("Username: ");
 		Label nameLabel 		= new Label("Name: ");
@@ -213,14 +218,139 @@ public class LibraryViewer extends Scene
 		});
 	}
 
+	private void setRemoveUserButton(Button button)
+	{
+		Alert confirmation = new Alert(Alert.AlertType.CONFIRMATION);
+		confirmation.setTitle("Remove user");
+		confirmation.setHeaderText("Are you sure?");
+		button.setOnAction(event -> {
+			Optional<ButtonType> returnValue = confirmation.showAndWait();
+			if(returnValue.isPresent() && returnValue.get().equals(ButtonType.OK))
+			{
+				try
+				{
+					User selected = users.selectionModelProperty().get().getSelectedItem();
+					if(selected != null)
+						controller.removeUser(selected);
+				}catch (Exception e)
+				{
+					e.printStackTrace();
+				}
+			}
+		});
+	}
+
 	private void setAddBookButton(Button button)
 	{
+		Alert dialog = new Alert(Alert.AlertType.CONFIRMATION);
+		TextField titleField 			= new TextField();
+		ComboBox<String> typeComboBox 	= new ComboBox<>(FXCollections.observableArrayList("Text", "General"));
+		TextField authorField 			= new TextField();
+		TextField publisherField 		= new TextField();
+		TextField yearField 			= new TextField();
+		TextField pagesField 			= new TextField();
+		typeComboBox.setValue("Text");
 
+		Label titleLabel 		= new Label("Title");
+		Label typeLabel 		= new Label("Type");
+		Label authorLabel 		= new Label("Author");
+		Label publisherLabel 	= new Label("Publisher");
+		Label yearLabel 		= new Label("Year");
+		Label pagesLabel		= new Label("Pages");
+
+		GridPane pane = new GridPane();
+
+		pane.addColumn(0,
+				titleLabel,
+				typeLabel,
+				authorLabel,
+				publisherLabel,
+				yearLabel,
+				pagesLabel);
+
+		pane.addColumn(1,
+				titleField,
+				typeComboBox,
+				authorField,
+				publisherField,
+				yearField,
+				pagesField);
+
+		dialog.setTitle("Add book");
+		dialog.setHeaderText("Book information");
+		dialog.getDialogPane().setContent(pane);
+
+		button.setOnAction(event -> {
+			Optional<ButtonType> returnValue = dialog.showAndWait();
+			if(returnValue.isPresent() && returnValue.get().equals(ButtonType.OK))
+			{
+				try
+				{
+					switch (typeComboBox.getValue())
+					{
+						case "Text":
+							controller.addText(titleField.getText(), authorField.getText(), publisherField.getText(), Integer.parseInt(yearField.getText()), Integer.parseInt(pagesField.getText()));
+							break;
+						case "General":
+							controller.addGeneral(titleField.getText(), authorField.getText(), publisherField.getText(), Integer.parseInt(yearField.getText()), Integer.parseInt(pagesField.getText()));
+							break;
+					}
+				}
+				catch (Exception e)
+				{
+					e.printStackTrace();
+				}
+			}
+
+		});
+	}
+
+	private void setRemoveBookButton(Button button)
+	{
+		Alert confirmation = new Alert(Alert.AlertType.CONFIRMATION);
+		confirmation.setTitle("Remove book");
+		confirmation.setHeaderText("Are you sure?");
+		button.setOnAction(event -> {
+			Optional<ButtonType> returnValue = confirmation.showAndWait();
+			if(returnValue.isPresent() && returnValue.get().equals(ButtonType.OK))
+			{
+				try
+				{
+					Book selected = books.selectionModelProperty().get().getSelectedItem();
+					if(selected != null)
+						controller.removeBook(selected);
+				}catch (Exception e)
+				{
+					e.printStackTrace();
+				}
+			}
+		});
 	}
 
 	private void setLendButton(Button button)
 	{
+		TextInputDialog dialog = new TextInputDialog();
 
+		dialog.setTitle("Lend book");
+		dialog.setHeaderText("Username");
+
+		button.setOnAction(event -> {
+			Optional<String> returnValue = dialog.showAndWait();
+			if(returnValue.isPresent())
+			{
+				try
+				{
+					Book selected = books.selectionModelProperty().get().getSelectedItem();
+					if(selected != null)
+						controller.lendBook(selected.id, returnValue.get());
+				}
+				catch (Exception e)
+				{
+					e.printStackTrace();
+				}
+			}
+
+		});
 	}
 
 	private void setReturnButton(Button button)
@@ -253,6 +383,7 @@ public class LibraryViewer extends Scene
         banned.setCellValueFactory(new PropertyValueFactory<>("banDate"));
 
 		users.getColumns().addAll(userId, name, cpf, address, contact, email, banned);
+		users.selectionModelProperty().get().setSelectionMode(SelectionMode.SINGLE);
 	}
 
 	private void addBookColumns()
@@ -273,6 +404,7 @@ public class LibraryViewer extends Scene
 		availability.setCellValueFactory(new PropertyValueFactory<>("isAvailable"));
 
 		books.getColumns().addAll(bookId, title, author, publisher, year, pages, availability);
+		books.selectionModelProperty().get().setSelectionMode(SelectionMode.SINGLE);
 	}
 
 	private void addLoanColumns()
@@ -289,6 +421,7 @@ public class LibraryViewer extends Scene
 		returnDate.setCellValueFactory(new PropertyValueFactory<>("returnDate"));
 
 		loans.getColumns().addAll(loanId, loanUserName, loanBookTitle, loanDate, returnDate);
+		loans.selectionModelProperty().get().setSelectionMode(SelectionMode.SINGLE);
 	}
 
 	private void fillTable()
