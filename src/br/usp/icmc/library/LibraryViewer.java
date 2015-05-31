@@ -1,5 +1,6 @@
 package br.usp.icmc.library;
 
+import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
@@ -271,26 +272,24 @@ public class LibraryViewer extends Scene
 				cpfLabel);
 
 		pane.addColumn(1,
-                usernameField,
-                nameField,
-                typeComboBox,
-                contactField,
-                emailField,
-                addressField,
-                cpfField);
+				usernameField,
+				nameField,
+				typeComboBox,
+				contactField,
+				emailField,
+				addressField,
+				cpfField);
 
 		dialog.setTitle("Add User");
         dialog.setHeaderText("Insert user information!");
 		dialog.getDialogPane().setContent(pane);
 
 		button.setOnAction(event -> {
+			Platform.runLater(() -> usernameField.requestFocus());
 			Optional<ButtonType> returnValue = dialog.showAndWait();
-			if(returnValue.isPresent() && returnValue.get().equals(ButtonType.OK))
-			{
-				try
-				{
-					switch (typeComboBox.getValue())
-					{
+			if (returnValue.isPresent() && returnValue.get().equals(ButtonType.OK)) {
+				try {
+					switch (typeComboBox.getValue()) {
 						case "Student":
 							controller.addStudent(
 									usernameField.getText(),
@@ -301,15 +300,24 @@ public class LibraryViewer extends Scene
 									cpfField.getText());
 							break;
 						case "Teacher":
-							controller.addTeacher(usernameField.getText(), nameField.getText(), contactField.getText(), emailField.getText(), addressField.getText(), cpfField.getText());
+							controller.addTeacher(
+									usernameField.getText(),
+									nameField.getText(),
+									contactField.getText(),
+									emailField.getText(),
+									addressField.getText(),
+									cpfField.getText());
 							break;
 						case "Community":
-							controller.addCommunity(usernameField.getText(), nameField.getText(), contactField.getText(), emailField.getText(), addressField.getText(), cpfField.getText());
+							controller.addCommunity(usernameField.getText(),
+									nameField.getText(),
+									contactField.getText(),
+									emailField.getText(),
+									addressField.getText(),
+									cpfField.getText());
 							break;
 					}
-				}
-				catch (Exception e)
-				{
+				} catch (Exception e) {
 					e.printStackTrace();
 					error.setTitle("Error adding user");
 					error.setHeaderText(e.getMessage());
@@ -317,6 +325,12 @@ public class LibraryViewer extends Scene
 				}
 			}
 
+			usernameField.clear();
+			nameField.clear();
+			contactField.clear();
+			emailField.clear();
+			addressField.clear();
+			cpfField.clear();
 		});
 	}
 
@@ -393,6 +407,7 @@ public class LibraryViewer extends Scene
 		dialog.getDialogPane().setContent(pane);
 
 		button.setOnAction(event -> {
+			Platform.runLater(() -> titleField.requestFocus());
 			Optional<ButtonType> returnValue = dialog.showAndWait();
 			if(returnValue.isPresent() && returnValue.get().equals(ButtonType.OK))
 			{
@@ -401,10 +416,20 @@ public class LibraryViewer extends Scene
 					switch (typeComboBox.getValue())
 					{
 						case "Text":
-							controller.addText(titleField.getText(), authorField.getText(), publisherField.getText(), Integer.parseInt(yearField.getText().trim()), Integer.parseInt(pagesField.getText().trim()));
+							controller.addText(
+									titleField.getText(),
+									authorField.getText(),
+									publisherField.getText(),
+									Integer.parseInt(yearField.getText()),
+									Integer.parseInt(pagesField.getText()));
 							break;
 						case "General":
-							controller.addGeneral(titleField.getText(), authorField.getText(), publisherField.getText(), Integer.parseInt(yearField.getText().trim()), Integer.parseInt(pagesField.getText().trim()));
+							controller.addGeneral(
+									titleField.getText(),
+									authorField.getText(),
+									publisherField.getText(),
+									Integer.parseInt(yearField.getText()),
+									Integer.parseInt(pagesField.getText()));
 							break;
 					}
 				}
@@ -424,6 +449,11 @@ public class LibraryViewer extends Scene
 				}
 			}
 
+			titleField.clear();
+			authorField.clear();
+			publisherField.clear();
+			yearField.clear();
+			pagesField.clear();
 		});
 	}
 
