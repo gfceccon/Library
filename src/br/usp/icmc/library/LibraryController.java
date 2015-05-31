@@ -78,7 +78,11 @@ public class LibraryController {
         if (loanId < 0 || loanId > loans.size() - 1)
             throw new IllegalArgumentException("Invalid loan ID!");
 
+
         Loan loan = loans.get(loanId); // Get the respective loan by the given id
+        if(loan.returnDate != null)
+            throw new Exception("This book have been returned already");
+
         Book book = searchBook(loan.bookId).get(); // Search for the book by the id from the loan
         User user = searchUserByLogin(loan.userLogin).get(); // Search for the user by the login from the loan
 
@@ -250,5 +254,11 @@ public class LibraryController {
         if(!b.isAvailable)
             throw new Exception("Book needs to be returned before being deleted");
         books.remove(b);
+    }
+
+    public LocalDate getCurrentDate()
+    {
+        LocalDate current = currentDate;
+        return current;
     }
 }

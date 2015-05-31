@@ -89,6 +89,11 @@ public abstract class User implements CSVSerializable {
             this.banDate = newBanDate;
     }
 
+	public String getType()
+	{
+		return this.getClass().getSimpleName();
+	}
+
     @Override
     public void parse(String[] args) throws Exception {
         this.login = args[1];

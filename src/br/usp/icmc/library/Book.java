@@ -68,6 +68,11 @@ public abstract class Book implements CSVSerializable
 		this.isAvailable = isAvailable;
 	}
 
+	public String getType()
+	{
+		return this.getClass().getSimpleName();
+	}
+
 	@Override
 	public void parse(String[] args) throws Exception
 	{

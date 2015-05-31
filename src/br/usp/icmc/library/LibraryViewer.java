@@ -38,6 +38,8 @@ public class LibraryViewer extends Scene
 	private TextField bookSearch;
 	private DatePicker loanSearch;
 
+	private Alert error = new Alert(Alert.AlertType.ERROR);
+
 	public LibraryViewer(Pane pane)
 	{
 		super(pane);
@@ -84,8 +86,17 @@ public class LibraryViewer extends Scene
                 LocalDate date = datePicker.getValue();
                 controller.setDate(date);
                 currentDate.setText(" Current date: " + date.format(DateTimeFormatter.ofPattern("dd/MM/yyyy")));
+				loans.getColumns().get(0).setVisible(false);
+				loans.getColumns().get(0).setVisible(true);
+				books.getColumns().get(0).setVisible(false);
+				books.getColumns().get(0).setVisible(true);
+				users.getColumns().get(0).setVisible(false);
+				users.getColumns().get(0).setVisible(true);
             } catch (Exception e) {
                 e.printStackTrace();
+				error.setTitle("Error setting date");
+				error.setHeaderText(e.getMessage());
+				error.show();
             }
         });
 
@@ -100,7 +111,7 @@ public class LibraryViewer extends Scene
 		usersTab.setClosable(false);
 
 		bookSearch = new TextField();
-		bookSearch.setPromptText("Search book by name");
+		bookSearch.setPromptText("Search book by id or title");
 		Button addBook = new Button("Add Book");
 		Button removeBook = new Button("Remove Book");
 		Button lendBook = new Button("Lend Book");
@@ -135,6 +146,7 @@ public class LibraryViewer extends Scene
 		setAddBookButton(addBook);
 		setRemoveBookButton(removeBook);
 		setLendButton(lendBook);
+		setReturnButton(returnBook);
 
 		setImportMenu(menuImportUsers, "Users");
 		setImportMenu(menuImportBooks, "Books");
@@ -299,6 +311,9 @@ public class LibraryViewer extends Scene
 				catch (Exception e)
 				{
 					e.printStackTrace();
+					error.setTitle("Error adding user");
+					error.setHeaderText(e.getMessage());
+					error.show();
 				}
 			}
 
@@ -322,6 +337,9 @@ public class LibraryViewer extends Scene
 				}catch (Exception e)
 				{
 					e.printStackTrace();
+					error.setTitle("Error removing user");
+					error.setHeaderText(e.getMessage());
+					error.show();
 				}
 			}
 		});
@@ -383,16 +401,26 @@ public class LibraryViewer extends Scene
 					switch (typeComboBox.getValue())
 					{
 						case "Text":
-							controller.addText(titleField.getText(), authorField.getText(), publisherField.getText(), Integer.parseInt(yearField.getText()), Integer.parseInt(pagesField.getText()));
+							controller.addText(titleField.getText(), authorField.getText(), publisherField.getText(), Integer.parseInt(yearField.getText().trim()), Integer.parseInt(pagesField.getText().trim()));
 							break;
 						case "General":
-							controller.addGeneral(titleField.getText(), authorField.getText(), publisherField.getText(), Integer.parseInt(yearField.getText()), Integer.parseInt(pagesField.getText()));
+							controller.addGeneral(titleField.getText(), authorField.getText(), publisherField.getText(), Integer.parseInt(yearField.getText().trim()), Integer.parseInt(pagesField.getText().trim()));
 							break;
 					}
+				}
+				catch(NumberFormatException ne)
+				{
+					ne.printStackTrace();
+					error.setTitle("Error adding book");
+					error.setHeaderText("Year and pages must be numeric");
+					error.show();
 				}
 				catch (Exception e)
 				{
 					e.printStackTrace();
+					error.setTitle("Error adding book");
+					error.setHeaderText(e.getMessage());
+					error.show();
 				}
 			}
 
@@ -416,6 +444,9 @@ public class LibraryViewer extends Scene
 				}catch (Exception e)
 				{
 					e.printStackTrace();
+					error.setTitle("Error removing book");
+					error.setHeaderText(e.getMessage());
+					error.show();
 				}
 			}
 		});
@@ -441,15 +472,41 @@ public class LibraryViewer extends Scene
 				catch (Exception e)
 				{
 					e.printStackTrace();
+					error.setTitle("Error lending book");
+					error.setHeaderText(e.getMessage());
+					error.show();
 				}
 			}
+			books.getColumns().get(0).setVisible(false);
+			books.getColumns().get(0).setVisible(true);
 
 		});
 	}
 
 	private void setReturnButton(Button button)
 	{
+		button.setOnAction(event -> {
+			try
+			{
+				Loan selected = loans.selectionModelProperty().get().getSelectedItem();
+				if(selected != null)
+					controller.returnBook(selected.id);
+			}
+			catch (Exception e)
+			{
+				e.printStackTrace();
+				error.setTitle("Error returning book");
+				error.setHeaderText(e.getMessage());
+				error.show();
+			}
+			loans.getColumns().get(0).setVisible(false);
+			loans.getColumns().get(0).setVisible(true);
+			books.getColumns().get(0).setVisible(false);
+			books.getColumns().get(0).setVisible(true);
+			users.getColumns().get(0).setVisible(false);
+			users.getColumns().get(0).setVisible(true);
 
+		});
 	}
 
 	private void addColumns()
@@ -461,6 +518,8 @@ public class LibraryViewer extends Scene
 
 	private void addUserColumns()
 	{
+		TableColumn<User, String> type = new TableColumn<>("Type");
+		type.setCellValueFactory(new PropertyValueFactory<>("type"));
 		TableColumn<User, String> userId = new TableColumn<>("Login");
 		userId.setCellValueFactory(new PropertyValueFactory<>("login"));
 		TableColumn<User, String> name = new TableColumn<>("Name");
@@ -476,12 +535,14 @@ public class LibraryViewer extends Scene
         TableColumn<User, String> banned = new TableColumn<>("Banned Until");
         banned.setCellValueFactory(new PropertyValueFactory<>("banDate"));
 
-		users.getColumns().addAll(userId, name, cpf, address, contact, email, banned);
+		users.getColumns().addAll(type, userId, name, cpf, address, contact, email, banned);
 		users.selectionModelProperty().get().setSelectionMode(SelectionMode.SINGLE);
 	}
 
 	private void addBookColumns()
 	{
+		TableColumn<Book, String> type = new TableColumn<>("Type");
+		type.setCellValueFactory(new PropertyValueFactory<>("type"));
 		TableColumn<Book, Integer> bookId = new TableColumn<>("ID");
 		bookId.setCellValueFactory(new PropertyValueFactory<>("id"));
 		TableColumn<Book, String> title = new TableColumn<>("Title");
@@ -497,7 +558,7 @@ public class LibraryViewer extends Scene
 		TableColumn<Book, String> availability = new TableColumn<>("Available?");
 		availability.setCellValueFactory(new PropertyValueFactory<>("isAvailable"));
 
-		books.getColumns().addAll(bookId, title, author, publisher, year, pages, availability);
+		books.getColumns().addAll(type, bookId, title, author, publisher, year, pages, availability);
 		books.selectionModelProperty().get().setSelectionMode(SelectionMode.SINGLE);
 	}
 
@@ -513,8 +574,10 @@ public class LibraryViewer extends Scene
 		loanDate.setCellValueFactory(new PropertyValueFactory<>("loanDate"));
 		TableColumn<Loan, String> returnDate = new TableColumn<>("Return Date");
 		returnDate.setCellValueFactory(new PropertyValueFactory<>("returnDate"));
+		TableColumn<Loan, String> isLate = new TableColumn<>("Late?");
+		isLate.setCellValueFactory(new PropertyValueFactory<>("isLate"));
 
-		loans.getColumns().addAll(loanId, loanUserName, loanBookTitle, loanDate, returnDate);
+		loans.getColumns().addAll(loanId, loanUserName, loanBookTitle, loanDate, returnDate, isLate);
 		loans.selectionModelProperty().get().setSelectionMode(SelectionMode.SINGLE);
 	}
 

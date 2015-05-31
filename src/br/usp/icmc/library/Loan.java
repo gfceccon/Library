@@ -2,6 +2,7 @@ package br.usp.icmc.library;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.Optional;
 
 public class Loan implements CSVSerializable {
     public int id;
@@ -80,6 +81,20 @@ public class Loan implements CSVSerializable {
 
     public void setReturnDate(String returnDate) {
         this.returnDate = LocalDate.parse(returnDate, DateTimeFormatter.ofPattern("dd/MM/yyyy"));
+    }
+
+    public String getIsLate()
+    {
+        if(returnDate != null)
+            return "-";
+        Optional<User> user = LibraryController.getInstance().searchUserByLogin(userLogin);
+        if(user.isPresent())
+        {
+            if(LibraryController.getInstance().getCurrentDate().compareTo(loanDate.plusDays(user.get().maxLoanTime)) > 0)
+                return "Yes";
+            return "No";
+        }
+        return "-";
     }
 
     @Override
