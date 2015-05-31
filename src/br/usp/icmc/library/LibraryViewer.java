@@ -54,12 +54,12 @@ public class LibraryViewer extends Scene
 		Menu menuImport = new Menu("Import");
 		Menu menuExport = new Menu("Export");
 
-		MenuItem menuImportUsers = new MenuItem("Users");
-		MenuItem menuImportBooks = new MenuItem("Books");
-		MenuItem menuImportLoans = new MenuItem("Loans");
-		MenuItem menuExportUsers = new MenuItem("Users");
-		MenuItem menuExportBooks = new MenuItem("Books");
-		MenuItem menuExportLoans = new MenuItem("Loans");
+		MenuItem menuImportUsers = new MenuItem("Users...");
+		MenuItem menuImportBooks = new MenuItem("Books...");
+		MenuItem menuImportLoans = new MenuItem("Loans...");
+		MenuItem menuExportUsers = new MenuItem("Users...");
+		MenuItem menuExportBooks = new MenuItem("Books...");
+		MenuItem menuExportLoans = new MenuItem("Loans...");
 
         MenuItem menuSetDate = new MenuItem("Set Date...");
         Label currentDate = new Label();
@@ -83,7 +83,7 @@ public class LibraryViewer extends Scene
 			{
                 LocalDate date = datePicker.getValue();
                 controller.setDate(date);
-                currentDate.setText(date.format(DateTimeFormatter.ofPattern("dd/MM/yyyy")));
+                currentDate.setText(" Current date: " + date.format(DateTimeFormatter.ofPattern("dd/MM/yyyy")));
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -94,6 +94,7 @@ public class LibraryViewer extends Scene
 		Button addUser = new Button("Add User");
 		Button removeUser = new Button("Remove User");
 		HBox hBoxUsersTab = new HBox(addUser, removeUser);
+		hBoxUsersTab.setAlignment(Pos.CENTER);
 		VBox vBoxUsersTab = new VBox(userSearch, users, hBoxUsersTab);
 		Tab usersTab = new Tab("Users", vBoxUsersTab);
 		usersTab.setClosable(false);
@@ -104,21 +105,24 @@ public class LibraryViewer extends Scene
 		Button removeBook = new Button("Remove Book");
 		Button lendBook = new Button("Lend Book");
 		HBox hBoxBooksTab = new HBox(addBook, removeBook, lendBook);
+		hBoxBooksTab.setAlignment(Pos.CENTER);
 		VBox vBoxBooksTab = new VBox(bookSearch, books, hBoxBooksTab);
 		Tab booksTab = new Tab("Books", vBoxBooksTab);
 		booksTab.setClosable(false);
 
-		Label loanSearchLabel = new Label(" Search loan by date: ");
+		Label loanSearchLabel = new Label("Search loan by date: ");
 		loanSearch = new DatePicker();
 		Button returnBook = new Button("Return Book");
 		HBox hBoxLoansTab = new HBox(loanSearchLabel, loanSearch);
-        hBoxLoansTab.setAlignment(Pos.CENTER_LEFT);
+        hBoxLoansTab.setAlignment(Pos.CENTER);
 		VBox vBoxLoansTab = new VBox(hBoxLoansTab, loans, returnBook);
+		vBoxLoansTab.setAlignment(Pos.CENTER);
 		Tab loansTab = new Tab("Loans", vBoxLoansTab);
 		loansTab.setClosable(false);
 
 		TabPane tabPane = new TabPane(usersTab, booksTab, loansTab);
 		VBox verticalPane = new VBox(menuBar, tabPane, currentDate);
+		verticalPane.setAlignment(Pos.TOP_CENTER);
 
 		verticalPane.setPrefWidth(800);
 		verticalPane.setPrefHeight(600);
@@ -147,7 +151,7 @@ public class LibraryViewer extends Scene
 		{
 			LocalDate date = datePicker.getValue();
 			controller.setDate(date);
-			currentDate.setText(date.format(DateTimeFormatter.ofPattern("dd/MM/yyyy")));
+			currentDate.setText("Current date: " + date.format(DateTimeFormatter.ofPattern("dd/MM/yyyy")));
 		}
 		catch (Exception e)
 		{
