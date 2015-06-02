@@ -1,43 +1,56 @@
 package br.usp.icmc.library;
 
-public class Teacher extends User {
-    public Teacher() {
-        maxBookCount = 6;
-        maxLoanTime = 60;
-    }
+/*
+	Teacher user
+	Can borrow 6 books at the same time max
+	Can borrow a book for 60 days
+ */
+public class Teacher extends User
+{
+	//Default constructor
+	public Teacher()
+	{
+		maxBookCount = 6;
+		maxLoanTime = 60;
+	}
 
-    public Teacher(String login, String name, String contact, String email, String address, String cpf) {
-        this.login = login;
-        this.name = name;
-        this.contact = contact;
-        this.email = email;
-        this.address = address;
-        this.cpf = cpf;
+	//Properties constructor
+	public Teacher(String login, String name, String contact, String email, String address, String cpf)
+	{
+		this.login = login;
+		this.name = name;
+		this.contact = contact;
+		this.email = email;
+		this.address = address;
+		this.cpf = cpf;
 
-        maxBookCount = 6;
-        maxLoanTime = 60;
-    }
+		maxBookCount = 6;
+		maxLoanTime = 60;
+	}
 
-    @Override
-    public void parse(String[] args) throws Exception {
-        if (args.length != getNumberOfArguments())
-            throw new IllegalArgumentException("Wrong number of arguments");
+	@Override
+	public void parse(String[] args) throws Exception
+	{
+		if (args.length != getNumberOfArguments())
+			throw new IllegalArgumentException("Wrong number of arguments");
 
-        super.parse(args);
-    }
+		super.parse(args);
+	}
 
-    @Override
-    public String[] toCSV() throws Exception {
-        String[] ret = new String[getNumberOfArguments()];
+	@Override
+	public String[] toCSV() throws Exception
+	{
+		String[] ret = new String[getNumberOfArguments()];
 
-        ret[0] = "Teacher";
-        ret = super.toCSV(ret);
+		ret[0] = "Teacher";
+		ret = super.toCSV(ret);
 
-        return ret;
-    }
+		return ret;
+	}
 
-    @Override
-    public int getNumberOfArguments() {
-        return 10;
-    }
+	@Override
+	public int getNumberOfArguments()
+	{
+		return 10;
+	}
 }

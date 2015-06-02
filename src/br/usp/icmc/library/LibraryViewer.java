@@ -51,9 +51,10 @@ public class LibraryViewer extends Scene
 		books = new TableView<>();
 		loans = new TableView<>();
 
-        MenuBar menuBar = new MenuBar();
-        Menu menuFile = new Menu("File");
-        Menu menuOption = new Menu("Options");
+		/* MENU BLOCK */
+		MenuBar menuBar = new MenuBar();
+		Menu menuFile = new Menu("File");
+		Menu menuOption = new Menu("Options");
 		Menu menuImport = new Menu("Import");
 		Menu menuExport = new Menu("Export");
 
@@ -64,43 +65,46 @@ public class LibraryViewer extends Scene
 		MenuItem menuExportBooks = new MenuItem("Books...");
 		MenuItem menuExportLoans = new MenuItem("Loans...");
 
-        MenuItem menuSetDate = new MenuItem("Set Date...");
-        Label currentDate = new Label();
+		MenuItem menuSetDate = new MenuItem("Set Date...");
+		Label currentDate = new Label();
 
-        menuFile.getItems().addAll(menuImport, menuExport);
+		menuFile.getItems().addAll(menuImport, menuExport);
 		menuImport.getItems().addAll(menuImportUsers, menuImportBooks, menuImportLoans);
 		menuExport.getItems().addAll(menuExportUsers, menuExportBooks, menuExportLoans);
-        menuOption.getItems().addAll(menuSetDate);
-        menuBar.getMenus().addAll(menuFile, menuOption);
+		menuOption.getItems().addAll(menuSetDate);
+		menuBar.getMenus().addAll(menuFile, menuOption);
 
-        Alert datePickerModal = new Alert(Alert.AlertType.CONFIRMATION);
-        DatePicker datePicker = new DatePicker();
-        datePickerModal.setTitle("Choose a Date");
-        datePickerModal.setHeaderText("Choose a date!");
-        datePickerModal.getDialogPane().setContent(datePicker);
-        menuSetDate.setOnAction(event -> {
-            ButtonType returnValue = datePickerModal.showAndWait().get();
-            if (returnValue == null || returnValue.equals(ButtonType.CANCEL))
-                return;
-            try
+		/* DATE PICKER BLOCK */
+		Alert datePickerModal = new Alert(Alert.AlertType.CONFIRMATION);
+		DatePicker datePicker = new DatePicker();
+		datePickerModal.setTitle("Choose a Date");
+		datePickerModal.setHeaderText("Choose a date!");
+		datePickerModal.getDialogPane().setContent(datePicker);
+		menuSetDate.setOnAction(event -> {
+			ButtonType returnValue = datePickerModal.showAndWait().get();
+			if (returnValue == null || returnValue.equals(ButtonType.CANCEL))
+				return;
+			try
 			{
-                LocalDate date = datePicker.getValue();
-                controller.setDate(date);
-                currentDate.setText(" Current date: " + date.format(DateTimeFormatter.ofPattern("dd/MM/yyyy")));
+				LocalDate date = datePicker.getValue();
+				controller.setDate(date);
+				currentDate.setText(" Current date: " + date.format(DateTimeFormatter.ofPattern("dd/MM/yyyy")));
 				loans.getColumns().get(0).setVisible(false);
 				loans.getColumns().get(0).setVisible(true);
 				books.getColumns().get(0).setVisible(false);
 				books.getColumns().get(0).setVisible(true);
 				users.getColumns().get(0).setVisible(false);
 				users.getColumns().get(0).setVisible(true);
-            } catch (Exception e) {
-                e.printStackTrace();
+			} catch (Exception e)
+			{
+				e.printStackTrace();
 				error.setTitle("Error setting date");
 				error.setHeaderText(e.getMessage());
 				error.show();
-            }
-        });
+			}
+		});
 
+		/* TABS BLOCK */
 		userSearch = new TextField();
 		userSearch.setPromptText("Search user by login or name");
 		Button addUser = new Button("Add User");
@@ -126,7 +130,7 @@ public class LibraryViewer extends Scene
 		loanSearch = new DatePicker();
 		Button returnBook = new Button("Return Book");
 		HBox hBoxLoansTab = new HBox(loanSearchLabel, loanSearch);
-        hBoxLoansTab.setAlignment(Pos.CENTER);
+		hBoxLoansTab.setAlignment(Pos.CENTER);
 		VBox vBoxLoansTab = new VBox(hBoxLoansTab, loans, returnBook);
 		vBoxLoansTab.setAlignment(Pos.CENTER);
 		Tab loansTab = new Tab("Loans", vBoxLoansTab);
@@ -139,7 +143,10 @@ public class LibraryViewer extends Scene
 		verticalPane.setPrefWidth(800);
 		verticalPane.setPrefHeight(600);
 		pane.getChildren().add(verticalPane);
+		/* END TABS BLOCK */
 
+
+		/* SETUP FUNCTIONS*/
 		addColumns();
 		fillTable();
 		setAddUserButton(addUser);
@@ -156,36 +163,41 @@ public class LibraryViewer extends Scene
 		setExportMenu(menuExportUsers, "Users");
 		setExportMenu(menuExportBooks, "Books");
 		setExportMenu(menuExportLoans, "Loans");
+		/* END SETUP FUNCTIONS*/
 
+		/* SHOWS DATE PICKER ON START */
 		ButtonType returnValue = datePickerModal.showAndWait().get();
-		if(returnValue == null || returnValue.equals(ButtonType.CANCEL))
+		if (returnValue == null || returnValue.equals(ButtonType.CANCEL))
 			System.exit(0);
 		try
 		{
 			LocalDate date = datePicker.getValue();
 			controller.setDate(date);
 			currentDate.setText("Current date: " + date.format(DateTimeFormatter.ofPattern("dd/MM/yyyy")));
-		}
-		catch (Exception e)
+		} catch (Exception e)
 		{
 			e.printStackTrace();
 			System.exit(0);
 		}
 	}
 
+	/*
+		SET IMPORT MENU OF A GIVEN A TYPE
+		Add ActionListener to the MenuItem menu that opens a file chooser
+	 */
 	private void setImportMenu(MenuItem menu, String type)
 	{
 		Stage fileChooserStage = new Stage();
 		FileChooser fileChooser = new FileChooser();
 		fileChooser.setTitle("Choose " + type + " Data File");
-		fileChooser.getExtensionFilters().addAll(
-                new ExtensionFilter("CSV Files", "*.csv"),
-                new ExtensionFilter("All Files", "*.*"));
+		fileChooser.getExtensionFilters().addAll(new ExtensionFilter("CSV Files", "*.csv"), new ExtensionFilter("All Files", "*.*"));
 
 		menu.setOnAction(event -> {
 			File selectedFile = fileChooser.showOpenDialog(fileChooserStage);
-			if(selectedFile != null){
-				switch(type){
+			if (selectedFile != null)
+			{
+				switch (type)
+				{
 					case "Users":
 						controller.setUsers(manager.parseUserFile(selectedFile));
 						break;
@@ -203,19 +215,23 @@ public class LibraryViewer extends Scene
 		});
 	}
 
+	/*
+		SET EXPORT MENU OF A GIVEN A TYPE
+		Add ActionListener to the MenuItem menu that opens a file chooser
+	 */
 	private void setExportMenu(MenuItem menu, String type)
 	{
 		Stage fileChooserStage = new Stage();
 		FileChooser fileChooser = new FileChooser();
-        fileChooser.setTitle("Choose " + type + " Data File");
-		fileChooser.getExtensionFilters().addAll(
-				new ExtensionFilter("CSV Files", "*.csv"),
-				new ExtensionFilter("All Files", "*.*"));
+		fileChooser.setTitle("Choose " + type + " Data File");
+		fileChooser.getExtensionFilters().addAll(new ExtensionFilter("CSV Files", "*.csv"), new ExtensionFilter("All Files", "*.*"));
 
 		menu.setOnAction(event -> {
 			File selectedFile = fileChooser.showSaveDialog(fileChooserStage);
-			if(selectedFile != null){
-				switch(type){
+			if (selectedFile != null)
+			{
+				switch (type)
+				{
 					case "Users":
 						manager.writeFile(selectedFile, controller.getUsers());
 						break;
@@ -232,92 +248,69 @@ public class LibraryViewer extends Scene
 		});
 	}
 
+	/*
+		ADD USER WINDOW
+		Add ActionListener to the MenuItem menu that opens a register window
+	 */
 	private void setAddUserButton(Button button)
 	{
 		Alert dialog = new Alert(Alert.AlertType.CONFIRMATION);
-		TextField usernameField 		= new TextField();
-		TextField nameField 			= new TextField();
-		ComboBox<String> typeComboBox 	= new ComboBox<>(FXCollections.observableArrayList("Student", "Teacher", "Community"));
-		TextField contactField 			= new TextField();
-		TextField emailField 			= new TextField();
-		TextField addressField 			= new TextField();
-		TextField cpfField 				= new TextField();
+		TextField usernameField = new TextField();
+		TextField nameField = new TextField();
+		ComboBox<String> typeComboBox = new ComboBox<>(FXCollections.observableArrayList("Student", "Teacher", "Community"));
+		TextField contactField = new TextField();
+		TextField emailField = new TextField();
+		TextField addressField = new TextField();
+		TextField cpfField = new TextField();
 		typeComboBox.setValue("Student");
 
-		Label usernameLabel 	= new Label("Username: ");
-		Label nameLabel 		= new Label("Name: ");
-		Label typeLabel 		= new Label("Type: ");
-		Label contactLabel 		= new Label("Contact: ");
-		Label emailLabel 		= new Label("Email: ");
-		Label addressLabel 		= new Label("Address: ");
-		Label cpfLabel			= new Label("CPF: ");
+		Label usernameLabel = new Label("Username: ");
+		Label nameLabel = new Label("Name: ");
+		Label typeLabel = new Label("Type: ");
+		Label contactLabel = new Label("Contact: ");
+		Label emailLabel = new Label("Email: ");
+		Label addressLabel = new Label("Address: ");
+		Label cpfLabel = new Label("CPF: ");
 
-        GridPane.setHalignment(usernameLabel, HPos.RIGHT);
-        GridPane.setHalignment(nameLabel, HPos.RIGHT);
-        GridPane.setHalignment(typeLabel, HPos.RIGHT);
-        GridPane.setHalignment(contactLabel, HPos.RIGHT);
-        GridPane.setHalignment(emailLabel, HPos.RIGHT);
-        GridPane.setHalignment(addressLabel, HPos.RIGHT);
-        GridPane.setHalignment(cpfLabel, HPos.RIGHT);
+		GridPane.setHalignment(usernameLabel, HPos.RIGHT);
+		GridPane.setHalignment(nameLabel, HPos.RIGHT);
+		GridPane.setHalignment(typeLabel, HPos.RIGHT);
+		GridPane.setHalignment(contactLabel, HPos.RIGHT);
+		GridPane.setHalignment(emailLabel, HPos.RIGHT);
+		GridPane.setHalignment(addressLabel, HPos.RIGHT);
+		GridPane.setHalignment(cpfLabel, HPos.RIGHT);
 
-        GridPane pane = new GridPane();
+		GridPane pane = new GridPane();
 
-		pane.addColumn(0,
-				usernameLabel,
-				nameLabel,
-				typeLabel,
-				contactLabel,
-				emailLabel,
-				addressLabel,
-				cpfLabel);
+		pane.addColumn(0, usernameLabel, nameLabel, typeLabel, contactLabel, emailLabel, addressLabel, cpfLabel);
 
-		pane.addColumn(1,
-				usernameField,
-				nameField,
-				typeComboBox,
-				contactField,
-				emailField,
-				addressField,
-				cpfField);
+		pane.addColumn(1, usernameField, nameField, typeComboBox, contactField, emailField, addressField, cpfField);
 
 		dialog.setTitle("Add User");
-        dialog.setHeaderText("Insert user information!");
+		dialog.setHeaderText("Insert user information!");
 		dialog.getDialogPane().setContent(pane);
 
 		button.setOnAction(event -> {
 			Platform.runLater(() -> usernameField.requestFocus());
 			Optional<ButtonType> returnValue = dialog.showAndWait();
-			if (returnValue.isPresent() && returnValue.get().equals(ButtonType.OK)) {
-				try {
-					switch (typeComboBox.getValue()) {
+			if (returnValue.isPresent() && returnValue.get().equals(ButtonType.OK))
+			{
+				try
+				{
+					switch (typeComboBox.getValue())
+					{
 						case "Student":
-							controller.addStudent(
-									usernameField.getText(),
-									nameField.getText(),
-									contactField.getText(),
-									emailField.getText(),
-									addressField.getText(),
-									cpfField.getText());
+							controller.addStudent(usernameField.getText(), nameField.getText(), contactField.getText(), emailField.getText(), addressField.getText(), cpfField.getText());
 							break;
 						case "Teacher":
-							controller.addTeacher(
-									usernameField.getText(),
-									nameField.getText(),
-									contactField.getText(),
-									emailField.getText(),
-									addressField.getText(),
-									cpfField.getText());
+							controller.addTeacher(usernameField.getText(), nameField.getText(), contactField.getText(), emailField.getText(), addressField.getText(), cpfField.getText());
 							break;
 						case "Community":
-							controller.addCommunity(usernameField.getText(),
-									nameField.getText(),
-									contactField.getText(),
-									emailField.getText(),
-									addressField.getText(),
-									cpfField.getText());
+							controller.addCommunity(usernameField.getText(), nameField.getText(), contactField.getText(), emailField.getText(), addressField.getText(), cpfField.getText());
 							break;
 					}
-				} catch (Exception e) {
+				} catch (Exception e)
+				{
 					e.printStackTrace();
 					error.setTitle("Error adding user");
 					error.setHeaderText(e.getMessage());
@@ -334,6 +327,10 @@ public class LibraryViewer extends Scene
 		});
 	}
 
+	/*
+		REMOVE USER WINDOW
+		Add ActionListener to the MenuItem menu that opens a delete window
+	 */
 	private void setRemoveUserButton(Button button)
 	{
 		Alert confirmation = new Alert(Alert.AlertType.CONFIRMATION);
@@ -341,14 +338,14 @@ public class LibraryViewer extends Scene
 		confirmation.setHeaderText("Are you sure?");
 		button.setOnAction(event -> {
 			Optional<ButtonType> returnValue = confirmation.showAndWait();
-			if(returnValue.isPresent() && returnValue.get().equals(ButtonType.OK))
+			if (returnValue.isPresent() && returnValue.get().equals(ButtonType.OK))
 			{
 				try
 				{
 					User selected = users.selectionModelProperty().get().getSelectedItem();
-					if(selected != null)
+					if (selected != null)
 						controller.removeUser(selected);
-				}catch (Exception e)
+				} catch (Exception e)
 				{
 					e.printStackTrace();
 					error.setTitle("Error removing user");
@@ -359,23 +356,27 @@ public class LibraryViewer extends Scene
 		});
 	}
 
+	/*
+		ADD BOOK WINDOW
+		Add ActionListener to the MenuItem menu that opens a register window
+	 */
 	private void setAddBookButton(Button button)
 	{
 		Alert dialog = new Alert(Alert.AlertType.CONFIRMATION);
-		TextField titleField 			= new TextField();
-		ComboBox<String> typeComboBox 	= new ComboBox<>(FXCollections.observableArrayList("Text", "General"));
-		TextField authorField 			= new TextField();
-		TextField publisherField 		= new TextField();
-		TextField yearField 			= new TextField();
-		TextField pagesField 			= new TextField();
+		TextField titleField = new TextField();
+		ComboBox<String> typeComboBox = new ComboBox<>(FXCollections.observableArrayList("Text", "General"));
+		TextField authorField = new TextField();
+		TextField publisherField = new TextField();
+		TextField yearField = new TextField();
+		TextField pagesField = new TextField();
 		typeComboBox.setValue("Text");
 
-		Label titleLabel 		= new Label("Title: ");
-		Label typeLabel 		= new Label("Type: ");
-		Label authorLabel 		= new Label("Author: ");
-		Label publisherLabel 	= new Label("Publisher: ");
-		Label yearLabel 		= new Label("Year: ");
-		Label pagesLabel		= new Label("Pages: ");
+		Label titleLabel = new Label("Title: ");
+		Label typeLabel = new Label("Type: ");
+		Label authorLabel = new Label("Author: ");
+		Label publisherLabel = new Label("Publisher: ");
+		Label yearLabel = new Label("Year: ");
+		Label pagesLabel = new Label("Pages: ");
 
 		GridPane.setHalignment(titleLabel, HPos.RIGHT);
 		GridPane.setHalignment(typeLabel, HPos.RIGHT);
@@ -386,21 +387,9 @@ public class LibraryViewer extends Scene
 
 		GridPane pane = new GridPane();
 
-		pane.addColumn(0,
-				titleLabel,
-				typeLabel,
-				authorLabel,
-				publisherLabel,
-				yearLabel,
-				pagesLabel);
+		pane.addColumn(0, titleLabel, typeLabel, authorLabel, publisherLabel, yearLabel, pagesLabel);
 
-		pane.addColumn(1,
-				titleField,
-				typeComboBox,
-				authorField,
-				publisherField,
-				yearField,
-				pagesField);
+		pane.addColumn(1, titleField, typeComboBox, authorField, publisherField, yearField, pagesField);
 
 		dialog.setTitle("Add Book");
 		dialog.setHeaderText("Insert book information!");
@@ -409,38 +398,26 @@ public class LibraryViewer extends Scene
 		button.setOnAction(event -> {
 			Platform.runLater(() -> titleField.requestFocus());
 			Optional<ButtonType> returnValue = dialog.showAndWait();
-			if(returnValue.isPresent() && returnValue.get().equals(ButtonType.OK))
+			if (returnValue.isPresent() && returnValue.get().equals(ButtonType.OK))
 			{
 				try
 				{
 					switch (typeComboBox.getValue())
 					{
 						case "Text":
-							controller.addText(
-									titleField.getText(),
-									authorField.getText(),
-									publisherField.getText(),
-									Integer.parseInt(yearField.getText()),
-									Integer.parseInt(pagesField.getText()));
+							controller.addText(titleField.getText(), authorField.getText(), publisherField.getText(), Integer.parseInt(yearField.getText()), Integer.parseInt(pagesField.getText()));
 							break;
 						case "General":
-							controller.addGeneral(
-									titleField.getText(),
-									authorField.getText(),
-									publisherField.getText(),
-									Integer.parseInt(yearField.getText()),
-									Integer.parseInt(pagesField.getText()));
+							controller.addGeneral(titleField.getText(), authorField.getText(), publisherField.getText(), Integer.parseInt(yearField.getText()), Integer.parseInt(pagesField.getText()));
 							break;
 					}
-				}
-				catch(NumberFormatException ne)
+				} catch (NumberFormatException ne)
 				{
 					ne.printStackTrace();
 					error.setTitle("Error adding book");
 					error.setHeaderText("Year and pages must be numeric");
 					error.show();
-				}
-				catch (Exception e)
+				} catch (Exception e)
 				{
 					e.printStackTrace();
 					error.setTitle("Error adding book");
@@ -457,6 +434,10 @@ public class LibraryViewer extends Scene
 		});
 	}
 
+	/*
+		REMOVE BOOK WINDOW
+		Add ActionListener to the MenuItem menu that opens a register window
+	 */
 	private void setRemoveBookButton(Button button)
 	{
 		Alert confirmation = new Alert(Alert.AlertType.CONFIRMATION);
@@ -464,14 +445,14 @@ public class LibraryViewer extends Scene
 		confirmation.setHeaderText("Are you sure?");
 		button.setOnAction(event -> {
 			Optional<ButtonType> returnValue = confirmation.showAndWait();
-			if(returnValue.isPresent() && returnValue.get().equals(ButtonType.OK))
+			if (returnValue.isPresent() && returnValue.get().equals(ButtonType.OK))
 			{
 				try
 				{
 					Book selected = books.selectionModelProperty().get().getSelectedItem();
-					if(selected != null)
+					if (selected != null)
 						controller.removeBook(selected);
-				}catch (Exception e)
+				} catch (Exception e)
 				{
 					e.printStackTrace();
 					error.setTitle("Error removing book");
@@ -482,6 +463,10 @@ public class LibraryViewer extends Scene
 		});
 	}
 
+	/*
+		REMOVE BOOK WINDOW
+		Add ActionListener to the MenuItem menu that opens a register window
+	 */
 	private void setLendButton(Button button)
 	{
 		TextInputDialog dialog = new TextInputDialog();
@@ -491,15 +476,14 @@ public class LibraryViewer extends Scene
 
 		button.setOnAction(event -> {
 			Optional<String> returnValue = dialog.showAndWait();
-			if(returnValue.isPresent())
+			if (returnValue.isPresent())
 			{
 				try
 				{
 					Book selected = books.selectionModelProperty().get().getSelectedItem();
-					if(selected != null)
+					if (selected != null)
 						controller.lendBook(selected.id, returnValue.get());
-				}
-				catch (Exception e)
+				} catch (Exception e)
 				{
 					e.printStackTrace();
 					error.setTitle("Error lending book");
@@ -513,16 +497,19 @@ public class LibraryViewer extends Scene
 		});
 	}
 
+	/*
+		RETURN BOOK WINDOW
+		Add ActionListener to the MenuItem menu that opens a register window
+	 */
 	private void setReturnButton(Button button)
 	{
 		button.setOnAction(event -> {
 			try
 			{
 				Loan selected = loans.selectionModelProperty().get().getSelectedItem();
-				if(selected != null)
+				if (selected != null)
 					controller.returnBook(selected.id);
-			}
-			catch (Exception e)
+			} catch (Exception e)
 			{
 				e.printStackTrace();
 				error.setTitle("Error returning book");
@@ -546,6 +533,11 @@ public class LibraryViewer extends Scene
 		addLoanColumns();
 	}
 
+	/*
+		TABLE COLUMNS BLOCK
+		Add columns to user, book and loan tables
+		Configure columns
+	 */
 	private void addUserColumns()
 	{
 		TableColumn<User, String> type = new TableColumn<>("Type");
@@ -554,16 +546,16 @@ public class LibraryViewer extends Scene
 		userId.setCellValueFactory(new PropertyValueFactory<>("login"));
 		TableColumn<User, String> name = new TableColumn<>("Name");
 		name.setCellValueFactory(new PropertyValueFactory<>("name"));
-        TableColumn<User, String> cpf = new TableColumn<>("CPF");
-        cpf.setCellValueFactory(new PropertyValueFactory<>("cpf"));
-        TableColumn<User, String> address = new TableColumn<>("Address");
-        address.setCellValueFactory(new PropertyValueFactory<>("address"));
+		TableColumn<User, String> cpf = new TableColumn<>("CPF");
+		cpf.setCellValueFactory(new PropertyValueFactory<>("cpf"));
+		TableColumn<User, String> address = new TableColumn<>("Address");
+		address.setCellValueFactory(new PropertyValueFactory<>("address"));
 		TableColumn<User, String> contact = new TableColumn<>("Contact");
 		contact.setCellValueFactory(new PropertyValueFactory<>("contact"));
 		TableColumn<User, String> email = new TableColumn<>("E-mail");
 		email.setCellValueFactory(new PropertyValueFactory<>("email"));
-        TableColumn<User, String> banned = new TableColumn<>("Banned Until");
-        banned.setCellValueFactory(new PropertyValueFactory<>("banDate"));
+		TableColumn<User, String> banned = new TableColumn<>("Banned Until");
+		banned.setCellValueFactory(new PropertyValueFactory<>("banDate"));
 
 		users.getColumns().addAll(type, userId, name, cpf, address, contact, email, banned);
 		users.selectionModelProperty().get().setSelectionMode(SelectionMode.SINGLE);
@@ -577,14 +569,14 @@ public class LibraryViewer extends Scene
 		bookId.setCellValueFactory(new PropertyValueFactory<>("id"));
 		TableColumn<Book, String> title = new TableColumn<>("Title");
 		title.setCellValueFactory(new PropertyValueFactory<>("title"));
-        TableColumn<Book, String> author = new TableColumn<>("Author");
-        author.setCellValueFactory(new PropertyValueFactory<>("author"));
-        TableColumn<Book, String> publisher = new TableColumn<>("Publisher");
-        publisher.setCellValueFactory(new PropertyValueFactory<>("publisher"));
-        TableColumn<Book, Integer> year = new TableColumn<>("Year");
-        year.setCellValueFactory(new PropertyValueFactory<>("year"));
-        TableColumn<Book, Integer> pages = new TableColumn<>("# of Pages");
-        pages.setCellValueFactory(new PropertyValueFactory<>("pages"));
+		TableColumn<Book, String> author = new TableColumn<>("Author");
+		author.setCellValueFactory(new PropertyValueFactory<>("author"));
+		TableColumn<Book, String> publisher = new TableColumn<>("Publisher");
+		publisher.setCellValueFactory(new PropertyValueFactory<>("publisher"));
+		TableColumn<Book, Integer> year = new TableColumn<>("Year");
+		year.setCellValueFactory(new PropertyValueFactory<>("year"));
+		TableColumn<Book, Integer> pages = new TableColumn<>("# of Pages");
+		pages.setCellValueFactory(new PropertyValueFactory<>("pages"));
 		TableColumn<Book, String> availability = new TableColumn<>("Available?");
 		availability.setCellValueFactory(new PropertyValueFactory<>("isAvailable"));
 
@@ -611,70 +603,75 @@ public class LibraryViewer extends Scene
 		loans.selectionModelProperty().get().setSelectionMode(SelectionMode.SINGLE);
 	}
 
-	private void fillTable() {
+	/*
+		Fill tables with controller's data
+		Create SortedList and binds a comparator
+	 */
+	private void fillTable()
+	{
 		ObservableList<User> obsUser = controller.getUsers();
 		ObservableList<Book> obsBook = controller.getBooks();
 		ObservableList<Loan> obsLoan = controller.getLoans();
 
-        FilteredList<User> filteredUser = new FilteredList<>(obsUser, u -> true);
+		FilteredList<User> filteredUser = new FilteredList<>(obsUser, u -> true);
 		FilteredList<Book> filteredBook = new FilteredList<>(obsBook, b -> true);
 		FilteredList<Loan> filteredLoan = new FilteredList<>(obsLoan, l -> true);
 
-        SortedList<User> sortedUser = new SortedList<>(filteredUser);
-        SortedList<Book> sortedBook = new SortedList<>(filteredBook);
-        SortedList<Loan> sortedLoan = new SortedList<>(filteredLoan);
+		SortedList<User> sortedUser = new SortedList<>(filteredUser);
+		SortedList<Book> sortedBook = new SortedList<>(filteredBook);
+		SortedList<Loan> sortedLoan = new SortedList<>(filteredLoan);
 
-        sortedBook.comparatorProperty().bind(books.comparatorProperty());
-        sortedUser.comparatorProperty().bind(users.comparatorProperty());
-        sortedLoan.comparatorProperty().bind(loans.comparatorProperty());
+		sortedBook.comparatorProperty().bind(books.comparatorProperty());
+		sortedUser.comparatorProperty().bind(users.comparatorProperty());
+		sortedLoan.comparatorProperty().bind(loans.comparatorProperty());
 
 		userSearch.textProperty().addListener((observable, oldValue, newValue) -> {
-            filteredUser.setPredicate(user -> {
-                if (newValue == null || newValue.isEmpty())
-                    return true;
+			filteredUser.setPredicate(user -> {
+				if (newValue == null || newValue.isEmpty())
+					return true;
 
-                String userFilter = newValue.toLowerCase();
+				String userFilter = newValue.toLowerCase();
 
-                if (user.getLogin().toLowerCase().contains(userFilter))
-                    return true;
-                else if (user.getName().toLowerCase().contains(userFilter))
-                    return true;
-                return false;
-            });
-        });
+				if (user.getLogin().toLowerCase().contains(userFilter))
+					return true;
+				else if (user.getName().toLowerCase().contains(userFilter))
+					return true;
+				return false;
+			});
+		});
 
 		bookSearch.textProperty().addListener((observable, oldValue, newValue) -> {
-            filteredBook.setPredicate(book -> {
-                if (newValue == null || newValue.isEmpty())
-                    return true;
+			filteredBook.setPredicate(book -> {
+				if (newValue == null || newValue.isEmpty())
+					return true;
 
-                String bookFilter = newValue.toLowerCase();
+				String bookFilter = newValue.toLowerCase();
 
-                if (book.getTitle().toLowerCase().contains(bookFilter))
-                    return true;
-                else if (Integer.toString(book.getId()).contains(bookFilter))
-                    return true;
-                return false;
-            });
-        });
+				if (book.getTitle().toLowerCase().contains(bookFilter))
+					return true;
+				else if (Integer.toString(book.getId()).contains(bookFilter))
+					return true;
+				return false;
+			});
+		});
 
 		loanSearch.setOnAction(event -> {
-            filteredLoan.setPredicate(loan -> {
-                if (loanSearch.getValue() == null)
-                    return true;
+			filteredLoan.setPredicate(loan -> {
+				if (loanSearch.getValue() == null)
+					return true;
 
-                String loanFilter = loanSearch.getValue().format(DateTimeFormatter.ofPattern("dd/MM/yyyy"));
+				String loanFilter = loanSearch.getValue().format(DateTimeFormatter.ofPattern("dd/MM/yyyy"));
 
-                if (loan.getLoanDate().equals(loanFilter))
-                    return true;
-                else if (loan.getReturnDate().equals(loanFilter))
-                    return true;
-                return false;
-            });
-        });
+				if (loan.getLoanDate().equals(loanFilter))
+					return true;
+				else if (loan.getReturnDate().equals(loanFilter))
+					return true;
+				return false;
+			});
+		});
 
-        users.setItems(sortedUser);
+		users.setItems(sortedUser);
 		books.setItems(sortedBook);
 		loans.setItems(sortedLoan);
-    }
+	}
 }

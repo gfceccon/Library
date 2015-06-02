@@ -22,4 +22,7 @@ Once in the Main Window, there are a couple of options. First, you will see a me
 Below the menu bar, there are three tabs. These are the Users/Books/Loans tabs, and they will let you see everything that is registered on the system as a list, and also search these lists for a specific registry.
 
 Lastly, we have an additional row of buttons, which are used to issue commands to the application. These buttons will let you add and remove users and books, and lend and return books.
+
 Each of these buttons will open a new window when clicked, where you can fill the fields to accomplish the desired task.
+
+DO NOT change the program date to the past, this will create inconsistent information like borrowed book in the future and will allow you to return a book in the past.
